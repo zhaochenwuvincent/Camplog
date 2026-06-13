@@ -47,6 +47,10 @@ svg{display:block}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){.screen.active{animation:none}*{transition:none !important}}
 
+/* ── parallax depth (poster marks drift on scroll / pointer-tilt) ── */
+[data-px]{will-change:transform}
+@media (prefers-reduced-motion: reduce){[data-px]{translate:none !important}}
+
 /* ── giant typographic wordmark / labels ── */
 .wordmark{font-family:var(--disp);font-weight:900;line-height:.88;letter-spacing:-.03em;
   color:var(--gray);white-space:nowrap;transform:scaleX(.96);transform-origin:left}
@@ -249,23 +253,25 @@ function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("sh
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1800); }
 
 /* ════════════ decoration builders (ported from poster-kit.jsx) ════════════ */
-function block(x,y,w,h,bg,z,extra){
-  return `<div style="position:absolute;left:${x};top:${y};width:${w};height:${h};background:${bg};z-index:${z||0};${extra||""}"></div>`;
+/* optional trailing `px` arg = parallax speed (see parallax engine below) */
+function pxA(px){ return (px==null) ? "" : ` data-px="${px}"`; }
+function block(x,y,w,h,bg,z,extra,px){
+  return `<div${pxA(px)} style="position:absolute;left:${x};top:${y};width:${w};height:${h};background:${bg};z-index:${z||0};${extra||""}"></div>`;
 }
-function blobHTML(w,rot,style){
+function blobHTML(w,rot,style,px){
   const h=Math.round(w*0.82);
-  return `<svg width="${w}" height="${h}" viewBox="0 0 240 196" style="transform:rotate(${rot}deg);${style||""}" aria-hidden="true"><path fill="${INK}" d="M58 14 C92 -2 120 6 138 12 C150 4 170 2 178 18 C196 16 210 30 206 50 C224 60 232 84 218 102 C228 122 214 146 192 148 C184 168 158 174 140 164 C120 178 92 176 78 160 C52 168 26 154 26 130 C6 122 -2 96 14 78 C2 56 18 30 42 30 C44 18 50 16 58 14 Z"></path></svg>`;
+  return `<svg${pxA(px)} width="${w}" height="${h}" viewBox="0 0 240 196" style="transform:rotate(${rot}deg);${style||""}" aria-hidden="true"><path fill="${INK}" d="M58 14 C92 -2 120 6 138 12 C150 4 170 2 178 18 C196 16 210 30 206 50 C224 60 232 84 218 102 C228 122 214 146 192 148 C184 168 158 174 140 164 C120 178 92 176 78 160 C52 168 26 154 26 130 C6 122 -2 96 14 78 C2 56 18 30 42 30 C44 18 50 16 58 14 Z"></path></svg>`;
 }
-function dotHTML(size,color,style){
-  return `<div style="position:absolute;width:${size}px;height:${size}px;border-radius:50%;background:${color};${style||""}"></div>`;
+function dotHTML(size,color,style,px){
+  return `<div${pxA(px)} style="position:absolute;width:${size}px;height:${size}px;border-radius:50%;background:${color};${style||""}"></div>`;
 }
 const TETRO={ l:[[0,0],[0,1],[0,2],[1,2]], s:[[1,0],[0,1],[1,1],[0,2]],
   t:[[0,0],[1,0],[2,0],[1,1]], step:[[1,0],[0,1],[1,1],[0,2],[1,2]] };
-function tetroHTML(shape,s,color,style){
+function tetroHTML(shape,s,color,style,px){
   const cells=TETRO[shape]||TETRO.l;
   const cols=Math.max(...cells.map(c=>c[0]))+1, rows=Math.max(...cells.map(c=>c[1]))+1;
   const inner=cells.map(([c,r])=>`<div style="position:absolute;left:${c*s}px;top:${r*s}px;width:${s}px;height:${s}px;background:${color}"></div>`).join("");
-  return `<div style="position:absolute;width:${s*cols}px;height:${s*rows}px;${style||""}" aria-hidden="true">${inner}</div>`;
+  return `<div${pxA(px)} style="position:absolute;width:${s*cols}px;height:${s*rows}px;${style||""}" aria-hidden="true">${inner}</div>`;
 }
 function waveHTML(w,h,color,sw,lines,style){
   let paths="";
@@ -280,9 +286,9 @@ function waveHTML(w,h,color,sw,lines,style){
 function squiggleHTML(w,color,sw,style){
   return `<svg width="${w}" height="${Math.round(w*1.15)}" viewBox="0 0 150 172" style="position:absolute;${style||""}" aria-hidden="true"><path fill="none" stroke="${color}" stroke-width="${sw||11}" stroke-linecap="round" stroke-linejoin="round" d="M14 26 C14 8 40 6 52 16 C66 28 50 48 32 46 C10 44 6 70 26 78 C50 88 78 70 70 46 C64 28 86 20 100 32 C118 47 102 78 78 96 C50 117 78 138 104 128 C126 120 140 138 132 156"></path></svg>`;
 }
-function arrowTileHTML(size,style){
+function arrowTileHTML(size,style,px){
   const a=Math.round(size*0.62);
-  return `<div style="position:absolute;width:${size}px;height:${size}px;background:${YELLOW};display:flex;align-items:center;justify-content:center;${style||""}" aria-hidden="true"><svg width="${a}" height="${a}" viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5 L19 19 M19 9 V19 H9"></path></svg></div>`;
+  return `<div${pxA(px)} style="position:absolute;width:${size}px;height:${size}px;background:${YELLOW};display:flex;align-items:center;justify-content:center;${style||""}" aria-hidden="true"><svg width="${a}" height="${a}" viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5 L19 19 M19 9 V19 H9"></path></svg></div>`;
 }
 function infoDotHTML(size,style){
   return `<svg width="${size}" height="${size}" viewBox="0 0 26 26" style="${style||""}" aria-hidden="true"><rect x="1.2" y="1.2" width="23.6" height="23.6" rx="7" fill="none" stroke="${INK}" stroke-width="1.8"></rect><circle cx="13" cy="8.4" r="1.5" fill="${INK}"></circle><path d="M13 12.2 V18.4" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"></path></svg>`;
@@ -364,15 +370,15 @@ function renderLog(){
     <div id="log-hero" style="position:relative;height:640px">
       ${block("0","calc(-1*var(--safe-top))","51%","calc(452px + var(--safe-top))",SAGE,0)}
       ${block("51%","calc(-1*var(--safe-top))","49%","calc(452px + var(--safe-top))",OLIVE,0)}
-      ${blobHTML(206,-4,"position:absolute;left:18px;top:28px;z-index:4")}
-      ${tetroHTML("s",22,INK,"left:300px;top:150px;z-index:4")}
-      ${block("300px","300px","62px","62px",CORAL,3)}
-      ${tetroHTML("t",24,INK,"left:286px;top:322px;z-index:4")}
-      ${dotHTML(18,INK,"left:296px;top:104px;z-index:4")}
-      ${dotHTML(14,INK,"left:384px;top:252px;z-index:4")}
-      ${arrowTileHTML(56,"left:22px;top:156px;z-index:5")}
-      <div class="wordmark" style="position:absolute;left:18px;top:84px;z-index:5;font-size:58px">CAMP LOG</div>
-      <div style="position:absolute;right:14px;top:344px;z-index:8;text-align:right">
+      ${blobHTML(206,-4,"position:absolute;left:18px;top:28px;z-index:4",0.18)}
+      ${tetroHTML("s",22,INK,"left:300px;top:150px;z-index:4",0.40)}
+      ${block("300px","300px","62px","62px",CORAL,3,"",0.30)}
+      ${tetroHTML("t",24,INK,"left:286px;top:322px;z-index:4",0.46)}
+      ${dotHTML(18,INK,"left:296px;top:104px;z-index:4",0.52)}
+      ${dotHTML(14,INK,"left:384px;top:252px;z-index:4",0.60)}
+      ${arrowTileHTML(56,"left:22px;top:156px;z-index:5",0.12)}
+      <div class="wordmark" data-px="0.16" style="position:absolute;left:18px;top:84px;z-index:5;font-size:58px">CAMP LOG</div>
+      <div data-px="-0.1" style="position:absolute;right:14px;top:344px;z-index:8;text-align:right">
         <div class="poster-label" style="font-size:40px">Next Out</div>
         ${cd?`<div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--coral-d);margin-top:4px">${cd}</div>`:""}
       </div>
@@ -412,6 +418,7 @@ function renderLog(){
   $("#btn-export").addEventListener("click",exportBackup);
   $("#btn-import").addEventListener("click",()=>$("#import-file").click());
   sizeLogHero();
+  collectParallax();
 }
 /* size the Log hero so the (variable-height) Next Out card never crowds the Trips sheet */
 function sizeLogHero(){
@@ -438,10 +445,10 @@ function renderPacking(){
     <div style="position:relative;height:250px">
       ${block("0","calc(-1*var(--safe-top))","57%","calc(250px + var(--safe-top))",SAGE,0)}
       ${block("57%","calc(-1*var(--safe-top))","43%","calc(250px + var(--safe-top))",OLIVE,0)}
-      ${blobHTML(250,-4,"position:absolute;left:-22px;top:34px;z-index:4")}
-      ${tetroHTML("l",20,INK,"right:28px;top:150px;z-index:4")}
-      ${block("300px","120px","50px","50px",CORAL,3)}
-      <div class="wordmark" style="position:absolute;left:18px;top:74px;z-index:6;font-size:58px">PACKING</div>
+      ${blobHTML(250,-4,"position:absolute;left:-22px;top:34px;z-index:4",0.18)}
+      ${tetroHTML("l",20,INK,"right:28px;top:150px;z-index:4",0.42)}
+      ${block("300px","120px","50px","50px",CORAL,3,"",0.30)}
+      <div class="wordmark" data-px="0.16" style="position:absolute;left:18px;top:74px;z-index:6;font-size:58px">PACKING</div>
     </div>
 
     <div class="sheet-zone">
@@ -468,6 +475,7 @@ function renderPacking(){
     });
   });
   $("#btn-reset").addEventListener("click",()=>{ state.checklist.forEach(it=>it.done=false); save(); renderPacking(); toast("Checklist reset"); });
+  collectParallax();
 }
 
 /* ════════════ SCREEN 3 · TO-DO ════════════ */
@@ -505,11 +513,11 @@ function renderTodo(){
     <div style="position:relative;height:236px">
       ${block("0","calc(-1*var(--safe-top))","49%","calc(236px + var(--safe-top))",OLIVE,0)}
       ${block("49%","calc(-1*var(--safe-top))","51%","calc(236px + var(--safe-top))",SAGE,0)}
-      ${blobHTML(224,-6,"position:absolute;right:-26px;top:32px;z-index:4")}
-      ${block("36px","150px","56px","56px",CORAL,3)}
-      ${tetroHTML("t",22,INK,"left:36px;top:150px;z-index:4")}
-      ${dotHTML(16,INK,"left:150px;top:120px;z-index:4")}
-      <div class="wordmark" style="position:absolute;right:22px;top:74px;z-index:6;font-size:62px;text-align:right">TO-DO</div>
+      ${blobHTML(224,-6,"position:absolute;right:-26px;top:32px;z-index:4",0.18)}
+      ${block("36px","150px","56px","56px",CORAL,3,"",0.30)}
+      ${tetroHTML("t",22,INK,"left:36px;top:150px;z-index:4",0.44)}
+      ${dotHTML(16,INK,"left:150px;top:120px;z-index:4",0.55)}
+      <div class="wordmark" data-px="0.16" style="position:absolute;right:22px;top:74px;z-index:6;font-size:62px;text-align:right">TO-DO</div>
     </div>
 
     <div class="sheet-zone">
@@ -536,6 +544,7 @@ function renderTodo(){
     });
   });
   $("#btn-clear").addEventListener("click",()=>{ state.todos=state.todos.filter(it=>!it.done); save(); renderTodo(); toast("Cleared done"); });
+  collectParallax();
 }
 
 /* ════════════ SCREEN 4 · CAMPFIRE (placeholder) ════════════ */
@@ -544,11 +553,11 @@ function renderCampfire(){
     <div style="position:relative;height:300px">
       ${block("0","calc(-1*var(--safe-top))","51%","calc(250px + var(--safe-top))",OLIVE,0)}
       ${block("51%","calc(-1*var(--safe-top))","49%","calc(250px + var(--safe-top))",SAGE,0)}
-      ${blobHTML(230,-4,"position:absolute;left:-18px;top:34px;z-index:4")}
-      ${tetroHTML("s",22,INK,"right:40px;top:150px;z-index:4")}
-      ${dotHTML(16,INK,"left:300px;top:120px;z-index:4")}
-      <div class="wordmark" style="position:absolute;left:18px;top:74px;z-index:6;font-size:50px">CAMPFIRE</div>
-      <div class="poster-label" style="position:absolute;left:20px;top:250px;z-index:7;font-size:26px">Gather Round</div>
+      ${blobHTML(230,-4,"position:absolute;left:-18px;top:34px;z-index:4",0.18)}
+      ${tetroHTML("s",22,INK,"right:40px;top:150px;z-index:4",0.40)}
+      ${dotHTML(16,INK,"left:300px;top:120px;z-index:4",0.55)}
+      <div class="wordmark" data-px="0.16" style="position:absolute;left:18px;top:74px;z-index:6;font-size:50px">CAMPFIRE</div>
+      <div class="poster-label" data-px="-0.08" style="position:absolute;left:20px;top:250px;z-index:7;font-size:26px">Gather Round</div>
     </div>
     <div class="paper" style="margin:54px 24px 0;padding:34px 24px;text-align:center">
       <div style="display:flex;justify-content:center;margin-bottom:14px">
@@ -559,6 +568,7 @@ function renderCampfire(){
         The campfire is still being built — stories, songs and stargazing notes will live here.
       </div>
     </div>`;
+  collectParallax();
 }
 
 /* ════════════ swipe-row interaction (ported from SwipeRow) ════════════ */
@@ -777,6 +787,41 @@ $("#import-file").addEventListener("change",e=>{
     }catch(err){ toast("That file isn't a Camp Log backup"); } };
   r.readAsText(file); e.target.value="";
 });
+
+/* ════════════ parallax depth ════════════
+   Floating poster marks carry a data-px speed. On scroll each is nudged by
+   scrollY × speed (back layers lag → recede; negative → pops forward); the
+   pointer adds a tiny tilt so the collage has depth even when still. We use the
+   independent CSS `translate` property so it stacks with the existing
+   transform:rotate()/scaleX() on blobs, seals and the wordmark instead of
+   overwriting them. Honours prefers-reduced-motion. */
+const PX_REDUCE = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+let pxEls=[], pxPointerX=0, pxPointerY=0, pxQueued=false;
+function applyParallax(){
+  pxQueued=false;
+  const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+  for(let i=0;i<pxEls.length;i++){
+    const el=pxEls[i], p=el._px, depth=Math.abs(p);
+    const tx = pxPointerX*depth*16;
+    const ty = y*p + pxPointerY*depth*12;
+    el.style.translate = tx.toFixed(2)+"px "+ty.toFixed(2)+"px";
+  }
+}
+function queueParallax(){ if(PX_REDUCE||pxQueued) return; pxQueued=true; requestAnimationFrame(applyParallax); }
+function collectParallax(){
+  const screen=$(".screen.active");
+  pxEls = screen ? Array.prototype.slice.call(screen.querySelectorAll("[data-px]")) : [];
+  for(let i=0;i<pxEls.length;i++) pxEls[i]._px = parseFloat(pxEls[i].dataset.px)||0;
+  if(PX_REDUCE){ pxEls.forEach(el=>el.style.translate=""); return; }
+  applyParallax();
+}
+window.addEventListener("scroll", queueParallax, {passive:true});
+window.addEventListener("pointermove", e=>{
+  if(PX_REDUCE) return;
+  pxPointerX = (e.clientX/(window.innerWidth||1))*2 - 1;
+  pxPointerY = (e.clientY/(window.innerHeight||1))*2 - 1;
+  queueParallax();
+}, {passive:true});
 
 /* ════════════ init ════════════ */
 if(!localStorage.getItem(KEY)) save();   // persist the seeded data with stable ids
