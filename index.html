@@ -97,7 +97,7 @@ svg{display:block}
 
 /* ── geo tab bar ── */
 nav.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:402px;z-index:30;
-  background:var(--cream);border-top:2px solid var(--ink);padding:12px 6px calc(var(--safe-bot) + 14px);display:flex}
+  background:var(--cream);box-shadow:0 -6px 22px rgba(34,30,24,.10),0 -1px 6px rgba(34,30,24,.05);padding:12px 6px calc(var(--safe-bot) + 14px);display:flex}
 .tabbar .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--ink-soft);
   font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 .tabbar .tab.active{color:var(--coral)}
@@ -151,6 +151,64 @@ textarea.f-input{resize:vertical;min-height:60px;border:1.5px solid var(--ink);b
   padding:10px 18px;border-radius:999px;font-family:var(--mono);font-size:.76rem;font-weight:600;
   opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ════════════ drifting black-dot particle layer (Log screen) ════════════ */
+#dot-particles{position:fixed;left:50%;transform:translateX(-50%);top:0;width:100%;max-width:402px;
+  height:100vh;height:100dvh;z-index:22;pointer-events:none}
+@media (prefers-reduced-motion: reduce){#dot-particles{display:none !important}}
+
+/* ════════════ Campfire activities ════════════ */
+.act-grid{display:flex;flex-direction:column;gap:13px}
+.act-card{position:relative;width:100%;text-align:left;display:flex;align-items:center;gap:15px;
+  background:var(--cream);border-radius:14px;padding:15px 16px;
+  box-shadow:0 10px 24px rgba(34,30,24,.16),0 2px 5px rgba(34,30,24,.10)}
+.act-ico{width:52px;height:52px;flex:0 0 auto;border-radius:13px;display:flex;align-items:center;justify-content:center}
+.act-arrow{margin-left:auto;flex:0 0 auto;color:var(--ink-soft)}
+
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);cursor:pointer;padding:6px 2px}
+.back-btn:active{transform:scale(.96)}
+
+/* die faces */
+.die{width:62px;height:62px;border-radius:13px;background:var(--cream);border:2.5px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  font-family:var(--disp);font-weight:900;color:var(--ink);
+  box-shadow:0 6px 14px rgba(34,30,24,.18)}
+@keyframes die-tumble{0%{transform:rotate(0) scale(1)}25%{transform:rotate(-15deg) scale(1.08)}
+  50%{transform:rotate(13deg) scale(.95)}75%{transform:rotate(-7deg) scale(1.05)}100%{transform:rotate(0) scale(1)}}
+.die.tumble{animation:die-tumble .2s linear infinite}
+.pip-grid{width:64%;height:64%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
+.pip-grid span{display:flex;align-items:center;justify-content:center}
+.pip{width:9px;height:9px;border-radius:50%;background:var(--ink)}
+
+/* coin */
+.coin{width:118px;height:118px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-weight:900;font-size:34px;color:#F6EFE2;background:var(--wood);letter-spacing:.02em;
+  box-shadow:0 12px 26px rgba(34,30,24,.30),inset 0 0 0 5px rgba(255,255,255,.18)}
+@keyframes coin-spin{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(900deg) scale(1.08)}100%{transform:rotateY(1800deg) scale(1)}}
+.coin.flipping{animation:coin-spin .72s ease-out}
+
+/* segmented control + stepper + side chips */
+.seg{display:inline-flex;background:var(--sage);border-radius:10px;padding:3px;gap:3px}
+.seg button{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.03em;padding:7px 13px;border-radius:8px;color:var(--ink-soft)}
+.seg button.on{background:var(--cream);color:var(--ink);box-shadow:0 1px 3px rgba(34,30,24,.18)}
+.stepper{display:inline-flex;align-items:center;border:2px solid var(--ink);border-radius:10px;overflow:hidden}
+.stepper button{width:38px;height:34px;font-family:var(--disp);font-weight:900;font-size:20px;background:var(--cream)}
+.stepper button:active{background:var(--sage)}
+.stepper .val{min-width:42px;text-align:center;font-family:var(--disp);font-weight:900;font-size:18px;
+  border-left:2px solid var(--ink);border-right:2px solid var(--ink);height:34px;line-height:34px}
+.side-chip{font-family:var(--mono);font-size:12px;font-weight:700;padding:6px 11px;border-radius:8px;
+  background:transparent;box-shadow:inset 0 0 0 1.5px var(--sage-d);color:var(--ink-soft)}
+.side-chip.on{background:var(--olive);color:#F1ECE0;box-shadow:none}
+
+/* prompt / spinner cards */
+.prompt-card{background:var(--kraft);border-radius:14px;padding:24px 20px;min-height:138px;width:100%;
+  display:flex;flex-direction:column;justify-content:center;box-shadow:0 10px 24px rgba(34,30,24,.16)}
+.spin-name{padding:11px 14px;border-radius:10px;font-family:var(--mono);font-weight:600;font-size:15px;
+  background:var(--cream);display:flex;align-items:center;gap:10px;box-shadow:0 2px 6px rgba(34,30,24,.10);
+  transition:transform .08s ease,background .08s ease}
+.spin-name.lit{background:var(--coral);color:#F6EFE2;transform:scale(1.03)}
+.spin-name.win{background:var(--olive);color:#F1ECE0;transform:scale(1.03)}
 </style>
 </head>
 <body>
@@ -162,6 +220,7 @@ textarea.f-input{resize:vertical;min-height:60px;border:1.5px solid var(--ink);b
   <section class="screen" id="screen-campfire" aria-label="Campfire"></section>
 </div>
 
+<canvas id="dot-particles" aria-hidden="true"></canvas>
 <div class="fab-host"><button class="fab" id="fab"></button></div>
 
 <nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
@@ -210,12 +269,16 @@ function seed(){
     trips: SEED.trips.map(t => ({ id:uid(), ...t })),
     checklist: SEED.checklist.map(([text,done]) => ({ id:uid(), text, done:!!done })),
     todos: SEED.todos.map(([text,done,group]) => ({ id:uid(), text, done:!!done, group })),
+    campfire: defaultCampfire(),
   };
 }
 function migrate(s){
   s.trips    = (s.trips||[]).map(t => ({ tags:[], notes:"", place:"", end:"", ...t }));
   s.checklist= (s.checklist||[]).map(it => ({ done:false, ...it }));
   s.todos    = (s.todos||[]).map(it => ({ done:false, group:it.group||"Tasks", ...it, group:it.group||"Tasks" }));
+  const dc=defaultCampfire(); s.campfire = s.campfire || {};
+  s.campfire.dice = { ...dc.dice, ...(s.campfire.dice||{}) };
+  s.campfire.spinner = Array.isArray(s.campfire.spinner) ? s.campfire.spinner : dc.spinner;
   return s;
 }
 function load(){
@@ -290,8 +353,33 @@ function waveHTML(w,h,color,sw,lines,style){
   }
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="${style||""}" aria-hidden="true">${paths}</svg>`;
 }
-function squiggleHTML(w,color,sw,style){
-  return `<svg width="${w}" height="${Math.round(w*1.15)}" viewBox="0 0 150 172" style="position:absolute;${style||""}" aria-hidden="true"><path fill="none" stroke="${color}" stroke-width="${sw||11}" stroke-linecap="round" stroke-linejoin="round" d="M14 26 C14 8 40 6 52 16 C66 28 50 48 32 46 C10 44 6 70 26 78 C50 88 78 70 70 46 C64 28 86 20 100 32 C118 47 102 78 78 96 C50 117 78 138 104 128 C126 120 140 138 132 156"></path></svg>`;
+function topoHTML(w,color,sw,style,px,lines){
+  lines=lines||6; sw=sw||2.6;
+  var h=Math.round(w*1.25), N=12, paths="";
+  for(var j=0;j<lines;j++){
+    var f=lines>1?j/(lines-1):0;
+    var startX=w*(0.60-0.08*f), endX=w*(0.36-0.30*f);
+    var amp=6+4*Math.sin(j*1.7), freq=1.8, phase=j*0.8;
+    var p=[];
+    for(var i=0;i<=N;i++){
+      var t=i/N;
+      var x=startX+(endX-startX)*t+Math.sin(t*Math.PI*freq+phase)*amp*(0.4+0.6*t);
+      var y=h*(0.03+0.94*t);
+      p.push([x,y]);
+    }
+    var d="M "+p[0][0].toFixed(1)+" "+p[0][1].toFixed(1)+" ";
+    for(var i=0;i<p.length-1;i++){
+      var p0=p[Math.max(0,i-1)],p1=p[i],p2=p[i+1],p3=p[Math.min(p.length-1,i+2)];
+      var c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6;
+      var c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
+      d+="C "+c1x.toFixed(1)+" "+c1y.toFixed(1)+" "+c2x.toFixed(1)+" "+c2y.toFixed(1)+" "+p2[0].toFixed(1)+" "+p2[1].toFixed(1)+" ";
+    }
+    paths+='<path d="'+d+'"></path>';
+  }
+  return '<svg'+pxA(px)+' width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" style="position:absolute;'+(style||"")+'" aria-hidden="true"><g fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round">'+paths+'</g></svg>';
+}
+function squiggleHTML(w,color,sw,style,px){
+  return `<svg${pxA(px)} width="${w}" height="${Math.round(w*1.15)}" viewBox="0 0 150 172" style="position:absolute;${style||""}" aria-hidden="true"><path fill="none" stroke="${color}" stroke-width="${sw||11}" stroke-linecap="round" stroke-linejoin="round" d="M14 26 C14 8 40 6 52 16 C66 28 50 48 32 46 C10 44 6 70 26 78 C50 88 78 70 70 46 C64 28 86 20 100 32 C118 47 102 78 78 96 C50 117 78 138 104 128 C126 120 140 138 132 156"></path></svg>`;
 }
 function arrowTileHTML(size,style,px){
   const a=Math.round(size*0.62);
@@ -322,7 +410,7 @@ function hlHTML(text){ return `<span class="hl"><b>${esc(text)}</b></span>`; }
 /* ════════════ SCREEN 1 · LOG ════════════ */
 function nextOutCard(t){
   if(!t){
-    return `<div class="paper" style="position:absolute;left:16px;top:398px;width:352px;z-index:6">
+    return `<div class="paper" style="position:absolute;left:27px;top:223px;width:352px;z-index:15">
       <div style="padding:24px 20px">
         <div class="poster-label" style="font-size:26px">Nothing planned</div>
         <div style="font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:8px;line-height:1.5">Tap the NEW LOG seal to plan your next trip — past or upcoming.</div>
@@ -333,7 +421,7 @@ function nextOutCard(t){
   if(t.tags&&t.tags[0]) tagBits.push(chipHTML(t.tags[0]));
   if(t.tags&&t.tags[1]) tagBits.push(hlHTML(t.tags[1]));
   const note = t.notes ? `<div style="font-family:var(--mono);font-size:13px;line-height:1.5;margin-top:12px;text-transform:uppercase">${esc(t.notes).replace(/\n/g,"<br>")}</div>` : "";
-  return `<div class="paper trip-card" data-id="${t.id}" style="position:absolute;left:16px;top:398px;width:352px;z-index:6;cursor:pointer">
+  return `<div class="paper trip-card" data-id="${t.id}" style="position:absolute;left:27px;top:223px;width:352px;z-index:15;cursor:pointer">
     <div style="padding:18px 20px 16px;position:relative">
       <div style="display:flex;align-items:flex-end;gap:14px">
         <div>
@@ -376,16 +464,16 @@ function renderLog(){
   $("#screen-log").innerHTML = `
     <div id="log-hero" style="position:relative;height:640px">
       ${block("0","calc(-1*var(--safe-top))","51%","calc(452px + var(--safe-top))",SAGE,0)}
-      ${block("51%","calc(-1*var(--safe-top))","49%","calc(452px + var(--safe-top))",OLIVE,0)}
+      ${block("190px","0px","217px","861px",OLIVE,0,"",0.05)}
       ${blobHTML(206,-4,"position:absolute;left:18px;top:28px;z-index:4",0.18)}
-      ${tetroHTML("s",22,INK,"left:300px;top:150px;z-index:4",0.40)}
+      ${tetroHTML("s",22,INK,"left:314px;top:180px;z-index:17;width:61px;height:59px",0.40)}
       ${block("300px","300px","62px","62px",CORAL,3,"",0.30)}
       ${tetroHTML("t",24,INK,"left:286px;top:322px;z-index:4",0.46)}
       ${dotHTML(18,INK,"left:296px;top:104px;z-index:4",0.52)}
       ${dotHTML(14,INK,"left:384px;top:252px;z-index:4",0.60)}
       ${arrowTileHTML(56,"left:22px;top:156px;z-index:5",0.12)}
-      <div class="wordmark" data-px="0.16" style="position:absolute;left:18px;top:84px;z-index:5;font-size:58px">CAMP LOG</div>
-      <div data-px="-0.1" style="position:absolute;right:14px;top:344px;z-index:8;text-align:right">
+      <div class="wordmark" data-px="0.16" style="position:absolute;left:18px;top:75px;z-index:5;font-size:58px;width:328px;height:60px">CAMP LOG</div>
+      <div data-px="-0.1" style="position:absolute;left:139px;right:auto;top:207px;z-index:18;text-align:right">
         <div class="poster-label" style="font-size:40px">Next Out</div>
         ${cd?`<div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--coral-d);margin-top:4px">${cd}</div>`:""}
       </div>
@@ -394,14 +482,15 @@ function renderLog(){
 
     <div class="sheet-zone" style="margin-top:6px">
       <div style="position:absolute;left:150px;top:0;width:218px;bottom:0;background:${OLIVE};z-index:0"></div>
-      <div style="position:absolute;left:-4px;top:0;width:326px;height:120px;background:${WOOD};z-index:3;overflow:hidden">
+      <div data-px="0.08" style="position:absolute;left:-19px;top:-148px;width:327px;height:199px;background:${WOOD};z-index:13;overflow:hidden">
         ${waveHTML(326,120,INK,12,3)}
       </div>
-      <div class="poster-label" style="position:absolute;left:30px;top:36px;font-size:40px;z-index:8">Trips</div>
-      <div style="position:relative;z-index:2;margin:64px 34px 0;background:${KRAFT};box-shadow:0 10px 26px rgba(34,30,24,.16);padding:42px 22px 22px">
-        ${tetroHTML("step",18,INK,"right:8px;top:14px;z-index:4")}
-        ${dotHTML(15,INK,"right:30px;top:120px;z-index:4")}
-        ${squiggleHTML(96,INK,11,"left:-12px;bottom:-12px;z-index:1")}
+      <div class="poster-label" data-px="0.06" style="position:absolute;left:220px;top:8px;font-size:40px;z-index:14">Trips</div>
+      <div style="position:relative;left:7px;top:-41px;z-index:11;margin:64px 34px 0;background:${KRAFT};box-shadow:0 10px 26px rgba(34,30,24,.16);padding:42px 22px 22px">
+        ${tetroHTML("step",18,INK,"right:8px;top:14px;z-index:6",0.12)}
+        ${dotHTML(15,INK,"right:30px;top:120px;z-index:4",0.14)}
+        <div data-px="0.1" style="position:absolute;left:-16px;bottom:-20px;width:172px;height:152px;overflow:hidden;z-index:20;opacity:.72;pointer-events:none" aria-hidden="true"><img src="73b.svg" alt="" style="position:absolute;width:824px;height:824px;left:-34px;top:-366px"></div>
+        
         <div style="position:relative;z-index:5">${rows}</div>
       </div>
       <div class="helper" style="margin-top:18px">
@@ -556,28 +645,420 @@ function renderTodo(){
   collectParallax();
 }
 
-/* ════════════ SCREEN 4 · CAMPFIRE (placeholder) ════════════ */
+/* ════════════ SCREEN 4 · CAMPFIRE ════════════
+   A list of activity cards; tapping one expands into a self-contained,
+   interactive activity (back button returns to the list). */
+const CAMP_REDUCE = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+function defaultCampfire(){ return {
+  dice:{ count:2, sides:6, mode:"number", faces:"Yes, No, Maybe" },
+  spinner:["Alex","Sam","Jordan","Riley"],
+}; }
+
+/* activity catalogue — icons paint with currentColor so each tints to its chip */
+const CF_ICON = {
+  dice:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4.5"/><circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.4" fill="currentColor" stroke="none"/></svg>`,
+  coin:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7l1.5 3.1 3.4.3-2.6 2.2.8 3.3-3.1-1.8-3.1 1.8.8-3.3-2.6-2.2 3.4-.3z" fill="currentColor" stroke="none"/></svg>`,
+  pick:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.4"/><path d="M12 3v3.2M12 17.8V21M3 12h3.2M17.8 12H21"/></svg>`,
+  truth:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 4H8a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4v3l4-3h8"/><path d="M9.6 9.2a2 2 0 0 1 3.8 1c0 1.4-1.7 1.6-1.7 2.7" stroke-linecap="round"/><circle cx="11.6" cy="15.4" r=".75" fill="currentColor" stroke="none"/></svg>`,
+  wyr:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8M12 13L6 7M12 13l6-6"/><path d="M6 3H3v3M18 3h3v3"/></svg>`,
+  story:`<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 6.5S9.5 4.5 4.5 4.5v13c5 0 7.5 2 7.5 2s2.5-2 7.5-2v-13C14.5 4.5 12 6.5 12 6.5z"/><path d="M12 6.5V21" stroke-linecap="round"/></svg>`,
+};
+const ACTIVITIES=[
+  {key:"dice", title:"Dice Roll",        blurb:"Roll any dice — set sides & faces", bg:CORAL,  ink:"#F6EFE2", icon:CF_ICON.dice},
+  {key:"coin", title:"Coin Flip",        blurb:"Heads or tails, settle it fast",     bg:YELLOW, ink:INK,       icon:CF_ICON.coin},
+  {key:"pick", title:"Who's Up?",        blurb:"Spin to pick a name at random",      bg:OLIVE,  ink:"#F1ECE0", icon:CF_ICON.pick},
+  {key:"truth",title:"Truth or Dare",    blurb:"Draw a prompt for the circle",       bg:WOOD,   ink:"#F3EAD6", icon:CF_ICON.truth},
+  {key:"wyr",  title:"Would You Rather", blurb:"Impossible choices by firelight",    bg:SAGED,  ink:INK,       icon:CF_ICON.wyr},
+  {key:"story",title:"Story Starter",    blurb:"A first line to spark a tale",       bg:CORALD, ink:"#F6EFE2", icon:CF_ICON.story},
+];
+
+/* built-in decks (family-friendly, around-the-fire) */
+const TRUTHS=[
+  "What's the most memorable meal you've ever had outdoors?",
+  "What's your biggest fear about camping — and has it ever come true?",
+  "If you could only bring three things to a desert island, what would they be?",
+  "Who in this group would survive longest in the wild, and why?",
+  "What's the bravest thing you've ever done?",
+  "What's a skill you really wish you had?",
+  "What's the strangest thing you've ever eaten?",
+  "What's your hidden talent that no one here knows about?",
+  "If you could wake up anywhere in the world tomorrow, where would it be?",
+  "What's the best trip you've ever been on?",
+  "What song do you secretly love but never admit to?",
+  "What's the worst gift you've ever received?",
+];
+const DARES=[
+  "Do your best impression of a wild animal until your next turn.",
+  "Speak in an accent until it's your turn again.",
+  "Tell a 30-second story that includes a bear, a flashlight, and a sandwich.",
+  "Hum a song and let everyone guess what it is.",
+  "Do 10 jumping jacks right now.",
+  "Talk for one minute without using the letter 'e'.",
+  "Give a dramatic reading of the nearest food label.",
+  "Invent a secret handshake with the person on your left.",
+  "Balance on one foot until your next turn.",
+  "Make up a short campfire jingle on the spot.",
+  "Pretend to be a tour guide describing this exact campsite.",
+  "Let the group give you a new camp nickname for the rest of the night.",
+];
+const WYR=[
+  ["Sleep under the stars with no tent","Sleep in a tent in pouring rain"],
+  ["Never feel cold again","Never feel too hot again"],
+  ["Hike 20 km to reach camp","Paddle 20 km to reach camp"],
+  ["Give up coffee for a year","Give up your phone for a month"],
+  ["Camp on a windy mountain peak","Camp by a buggy quiet lake"],
+  ["Fight one horse-sized duck","Fight a hundred duck-sized horses"],
+  ["Always have slightly wet socks","Always have a pebble in your shoe"],
+  ["Be able to talk to animals","Speak every human language"],
+  ["Have a campfire that never goes out","Have a pack that's always perfectly packed"],
+  ["Only eat trail mix for a week","Only drink lake water for a week"],
+  ["Wake for every sunrise","Stay up for every sunset"],
+  ["Be lost but warm","Be found but freezing"],
+];
+const STORY_STARTERS=[
+  "The map said the trail ended at the lake. It didn't.",
+  "Nobody remembered packing the third sleeping bag — so whose was it?",
+  "The fire had been out for an hour when we heard it crackle back to life.",
+  "Legend says the old ranger never actually left these woods…",
+  "It started with a single set of footprints leading away from camp.",
+  "We all agreed not to open the cooler after dark. We were wrong.",
+  "The compass spun in slow circles, then pointed — every time — at the same tree.",
+  "At exactly midnight, every owl in the forest went silent.",
+  "The last entry in the cabin's logbook simply read: ‘Don't follow the lights.'",
+  "Someone had already built our campfire — and it was still warm.",
+];
+
+/* view + animation bookkeeping (volatile; not persisted) */
+let campfireView=null, campTimers=[], campRaf=0;
+let diceRolling=false, coinFlipping=false, spinning=false;
+let lastDice=null, coinHist=[], pickWinner=null;
+let tdLast=null, tdIdx={Truth:-1,Dare:-1};
+let wyrLast=null, wyrIdx=-1, storyLast=null, storyIdx=-1;
+
+function campTimeout(fn,ms){ const id=setTimeout(fn,ms); campTimers.push(["t",id]); return id; }
+function campInterval(fn,ms){ const id=setInterval(fn,ms); campTimers.push(["i",id]); return id; }
+function stopCampAnim(){
+  campTimers.forEach(p=> p[0]==="i" ? clearInterval(p[1]) : clearTimeout(p[1]));
+  campTimers=[]; if(campRaf){ cancelAnimationFrame(campRaf); campRaf=0; }
+  diceRolling=coinFlipping=spinning=false;
+}
+/* draw a random index from a deck, avoiding an immediate repeat */
+function drawIdx(len,prev){ if(len<=1) return 0; let i; do{ i=Math.floor(Math.random()*len); }while(i===prev); return i; }
+
 function renderCampfire(){
-  $("#screen-campfire").innerHTML = `
-    <div style="position:relative;height:300px">
+  stopCampAnim();
+  const scr=$("#screen-campfire");
+  if(!campfireView){ scr.innerHTML=campfireListHTML(); wireCampfireList(); }
+  else{
+    const a=ACTIVITIES.find(x=>x.key===campfireView)||ACTIVITIES[0];
+    scr.innerHTML=campfireShell(a); renderActivityBody(a.key); wireCampBack();
+  }
+  collectParallax();
+}
+
+/* ── activity list ── */
+function campfireListHTML(){
+  const cards = ACTIVITIES.map(a=>`
+    <button class="act-card" data-key="${a.key}">
+      <span class="act-ico" style="background:${a.bg};color:${a.ink}">${a.icon}</span>
+      <span style="flex:1;min-width:0">
+        <span style="display:block;font-family:var(--disp);font-weight:800;font-size:19px;letter-spacing:-.01em">${esc(a.title)}</span>
+        <span style="display:block;font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:2px">${esc(a.blurb)}</span>
+      </span>
+      <svg class="act-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>`).join("");
+  return `
+    <div style="position:relative;height:250px">
       ${block("0","calc(-1*var(--safe-top))","51%","calc(250px + var(--safe-top))",OLIVE,0)}
       ${block("51%","calc(-1*var(--safe-top))","49%","calc(250px + var(--safe-top))",SAGE,0)}
-      ${blobHTML(230,-4,"position:absolute;left:-18px;top:34px;z-index:4",0.18)}
-      ${tetroHTML("s",22,INK,"right:40px;top:150px;z-index:4",0.40)}
-      ${dotHTML(16,INK,"left:300px;top:120px;z-index:4",0.55)}
+      ${blobHTML(220,-4,"position:absolute;left:-18px;top:30px;z-index:4",0.18)}
+      ${tetroHTML("s",22,INK,"right:40px;top:140px;z-index:4",0.40)}
+      ${block("300px","150px","54px","54px",CORAL,3,"",0.30)}
+      ${dotHTML(16,INK,"left:150px;top:60px;z-index:4",0.55)}
       <div class="wordmark" data-px="0.16" style="position:absolute;left:18px;top:74px;z-index:6;font-size:50px">CAMPFIRE</div>
-      <div class="poster-label" data-px="-0.08" style="position:absolute;left:20px;top:250px;z-index:7;font-size:26px">Gather Round</div>
+      <div class="poster-label" data-px="-0.08" style="position:absolute;left:20px;top:196px;z-index:7;font-size:26px">Gather Round</div>
     </div>
-    <div class="paper" style="margin:54px 24px 0;padding:34px 24px;text-align:center">
-      <div style="display:flex;justify-content:center;margin-bottom:14px">
-        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="${CORAL}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 C 13 7 17 8.5 17 13 a5 5 0 0 1 -10 0 C 7 9.5 10.5 8 12 3 Z"></path><path d="M5 21 h14"></path></svg>
+    <div style="position:relative;margin:22px 24px 0">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase;margin-bottom:14px">Pick an activity</div>
+      <div class="act-grid">${cards}</div>
+    </div>`;
+}
+function wireCampfireList(){
+  $("#screen-campfire").querySelectorAll(".act-card").forEach(b=>{
+    b.addEventListener("click",()=>{ bounceTap(b);
+      campTimeout(()=>{ campfireView=b.dataset.key; renderCampfire(); window.scrollTo({top:0}); },140); });
+  });
+}
+
+/* ── expanded-activity shell (header + back + body slot) ── */
+function campfireShell(a){
+  return `
+    <div style="position:relative;padding:calc(var(--safe-top) + 16px) 24px 0">
+      <div style="position:absolute;left:0;right:0;top:0;height:150px;background:${a.bg};opacity:.16;z-index:0"></div>
+      <button class="back-btn" id="cf-back">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        All activities
+      </button>
+      <div style="display:flex;align-items:center;gap:13px;margin-top:8px;position:relative;z-index:1">
+        <span class="act-ico" style="background:${a.bg};color:${a.ink};width:46px;height:46px">${a.icon}</span>
+        <div class="poster-label" style="font-size:30px">${esc(a.title)}</div>
       </div>
-      <div class="poster-label" style="font-size:30px">Coming soon</div>
-      <div style="font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.6">
-        The campfire is still being built — stories, songs and stargazing notes will live here.
+      <div id="cf-body" style="position:relative;z-index:1;margin-top:22px"></div>
+    </div>`;
+}
+function wireCampBack(){
+  const b=$("#cf-back");
+  b&&b.addEventListener("click",()=>{ campfireView=null; renderCampfire(); window.scrollTo({top:0}); });
+}
+function renderActivityBody(key){
+  ({dice:bodyDice, coin:bodyCoin, pick:bodyPick, truth:bodyTruth, wyr:bodyWyr, story:bodyStory}[key]||bodyDice)();
+}
+
+/* ════ activity · DICE ROLL ════ */
+const PIPS={1:[4],2:[2,6],3:[2,4,6],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function pipHTML(v){
+  const set=PIPS[v]||[]; let cells="";
+  for(let i=0;i<9;i++) cells+=`<span>${set.indexOf(i)>=0?'<i class="pip"></i>':""}</span>`;
+  return `<span class="pip-grid">${cells}</span>`;
+}
+function diceFaces(cfg,liveStr){
+  if(cfg.mode==="custom"){
+    const raw=(liveStr!=null?liveStr:cfg.faces)||"";
+    const arr=raw.split(",").map(s=>s.trim()).filter(Boolean);
+    return arr.length?arr:["?"];
+  }
+  const a=[]; for(let i=1;i<=cfg.sides;i++) a.push(i); return a;
+}
+function dieFaceHTML(value,cfg){
+  if(cfg.mode!=="custom" && cfg.sides===6 && typeof value==="number") return pipHTML(value);
+  const s=String(value);
+  const fs = s.length<=2?24 : s.length<=4?17 : s.length<=7?12 : 10;
+  return `<span style="font-size:${fs}px;line-height:1.05;padding:3px;text-align:center;word-break:break-word">${esc(s)}</span>`;
+}
+function diceSummary(vals,cfg){
+  if(cfg.mode==="custom") return vals.map(v=>`<b style="color:var(--ink)">${esc(String(v))}</b>`).join(" · ");
+  const total=vals.reduce((a,b)=>a+b,0);
+  if(vals.length===1) return `You rolled <b style="color:var(--ink);font-size:16px">${total}</b>`;
+  return vals.join(" + ")+` = <b style="color:var(--coral-d);font-size:16px">${total}</b>`;
+}
+function bodyDice(){
+  const cfg=state.campfire.dice, body=$("#cf-body");
+  const dice = Array.from({length:cfg.count},(_,i)=>`<div class="die" data-i="${i}">${dieFaceHTML(lastDice?lastDice[i]:"?",cfg)}</div>`).join("");
+  const sideChips=[4,6,8,10,12,20].map(n=>`<button class="side-chip ${cfg.mode!=="custom"&&cfg.sides===n?"on":""}" data-side="${n}" ${cfg.mode==="custom"?'disabled style="opacity:.4"':""}>d${n}</button>`).join("");
+  body.innerHTML=`
+    <div id="dice-tray" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;min-height:74px">${dice}</div>
+    <div id="dice-total" style="text-align:center;font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:14px;min-height:20px">${lastDice?diceSummary(lastDice,cfg):"Tap roll to throw the dice"}</div>
+    <button class="btn-create" id="dice-roll" style="margin-top:16px">Roll</button>
+    <div style="margin-top:26px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span class="f-label" style="margin:0">How many dice</span>
+        <div class="stepper"><button data-d="-1" aria-label="fewer">−</button><span class="val">${cfg.count}</span><button data-d="1" aria-label="more">+</button></div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span class="f-label" style="margin:0">Faces</span>
+          <div class="seg"><button data-mode="number" class="${cfg.mode!=="custom"?"on":""}">Numbers</button><button data-mode="custom" class="${cfg.mode==="custom"?"on":""}">Custom</button></div>
+        </div>
+        <div id="sides-row" style="display:${cfg.mode==="custom"?"none":"flex"};flex-wrap:wrap;gap:8px">${sideChips}</div>
+        <div id="custom-row" style="display:${cfg.mode==="custom"?"block":"none"}">
+          <input class="f-input" id="dice-faces" placeholder="Yes, No, Maybe" value="${esc(cfg.faces||"")}">
+          <div class="helper" style="text-align:left;margin-top:7px">Separate each face with a comma</div>
+        </div>
       </div>
     </div>`;
-  collectParallax();
+  $("#dice-roll").addEventListener("click",rollDice);
+  body.querySelectorAll(".stepper button").forEach(b=>b.addEventListener("click",()=>{
+    cfg.count=Math.max(1,Math.min(8,cfg.count+(+b.dataset.d))); lastDice=null; save(); bodyDice();
+  }));
+  body.querySelectorAll(".side-chip").forEach(b=>b.addEventListener("click",()=>{
+    if(cfg.mode==="custom") return; cfg.sides=+b.dataset.side; lastDice=null; save(); bodyDice();
+  }));
+  body.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
+    const m=b.dataset.mode; if(cfg.mode===m) return;
+    if(cfg.mode==="custom" && $("#dice-faces")) cfg.faces=$("#dice-faces").value;   // keep typed faces
+    cfg.mode=m; lastDice=null; save(); bodyDice();
+  }));
+  const fi=$("#dice-faces");
+  fi&&fi.addEventListener("change",()=>{ cfg.faces=fi.value; save(); });
+}
+function rollDice(){
+  if(diceRolling) return;
+  const cfg=state.campfire.dice, tray=$("#dice-tray"); if(!tray) return;
+  const liveStr = (cfg.mode==="custom" && $("#dice-faces")) ? $("#dice-faces").value : null;
+  if(liveStr!=null){ cfg.faces=liveStr; save(); }
+  const faces=diceFaces(cfg,liveStr);
+  const dieEls=Array.prototype.slice.call(tray.querySelectorAll(".die"));
+  const pick=()=>faces[Math.floor(Math.random()*faces.length)];
+  const finalVals=dieEls.map(pick);
+  const settle=()=>{
+    dieEls.forEach((el,i)=>{ el.classList.remove("tumble"); el.innerHTML=dieFaceHTML(finalVals[i],cfg); bounceTap(el); });
+    lastDice=finalVals;
+    const tot=$("#dice-total"); if(tot) tot.innerHTML=diceSummary(finalVals,cfg);
+    diceRolling=false;
+  };
+  if(CAMP_REDUCE){ settle(); return; }
+  diceRolling=true;
+  dieEls.forEach(el=>el.classList.add("tumble"));
+  let ticks=0;
+  campInterval(()=>{
+    dieEls.forEach(el=> el.innerHTML=dieFaceHTML(pick(),cfg));
+    if(++ticks>=12){ stopCampAnim(); settle(); }
+  },55);
+}
+
+/* ════ activity · COIN FLIP ════ */
+function coinHistHTML(){
+  if(!coinHist.length) return '<span style="font-family:var(--mono);font-size:12px;color:var(--ink-soft)">No flips yet</span>';
+  return coinHist.slice(0,16).map(h=>`<span style="width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:11px;color:#F6EFE2;background:${h==="H"?"var(--coral)":"var(--olive)"}">${h}</span>`).join("");
+}
+function bodyCoin(){
+  const body=$("#cf-body"), top=coinHist[0];
+  body.innerHTML=`
+    <div style="display:flex;justify-content:center;margin-top:4px;perspective:700px">
+      <div class="coin" id="cf-coin">${top||"?"}</div>
+    </div>
+    <div id="cf-coin-label" style="text-align:center;font-family:var(--disp);font-weight:900;font-size:26px;margin-top:16px;min-height:30px;letter-spacing:.02em">${top?(top==="H"?"Heads":"Tails"):""}</div>
+    <button class="btn-create" id="cf-flip" style="margin-top:12px">Flip</button>
+    <div style="margin-top:24px;text-align:center">
+      <div class="f-label">Recent flips</div>
+      <div id="cf-coin-hist" style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:9px;min-height:24px">${coinHistHTML()}</div>
+    </div>`;
+  if(top){ const c=$("#cf-coin"); c.style.background = top==="H"?"var(--coral)":"var(--olive)"; }
+  $("#cf-flip").addEventListener("click",flipCoin);
+}
+function flipCoin(){
+  if(coinFlipping) return;
+  const coin=$("#cf-coin"), label=$("#cf-coin-label"); if(!coin) return;
+  const res = Math.random()<0.5 ? "H" : "T";
+  const done=()=>{
+    coin.textContent=res; coin.style.background = res==="H"?"var(--coral)":"var(--olive)";
+    if(label) label.textContent = res==="H"?"Heads":"Tails";
+    coinHist.unshift(res); coinHist=coinHist.slice(0,40);
+    const h=$("#cf-coin-hist"); if(h) h.innerHTML=coinHistHTML();
+    coinFlipping=false;
+  };
+  if(CAMP_REDUCE){ done(); return; }
+  coinFlipping=true;
+  coin.classList.add("flipping");
+  const iv=campInterval(()=>{ coin.textContent = Math.random()<0.5?"H":"T"; },70);
+  campTimeout(()=>{ clearInterval(iv); coin.classList.remove("flipping"); done(); },720);
+}
+
+/* ════ activity · WHO'S UP? (name spinner) ════ */
+function bodyPick(){
+  const body=$("#cf-body"), names=state.campfire.spinner;
+  const list = names.length
+    ? names.map((n,i)=>`<div class="spin-name" data-i="${i}"><span style="flex:1">${esc(n)}</span><button class="spin-del" data-i="${i}" aria-label="remove" style="color:inherit;opacity:.55;line-height:0;padding:4px;font-size:15px">✕</button></div>`).join("")
+    : `<div class="empty-note" style="padding:10px">Add a few names to spin.</div>`;
+  body.innerHTML=`
+    <div id="pick-result" style="text-align:center;font-family:var(--disp);font-weight:900;font-size:24px;min-height:30px;margin-bottom:2px">${pickWinner?esc(pickWinner)+" is up! 🔥":""}</div>
+    <button class="btn-create" id="pick-spin" style="margin:6px 0 20px">Pick someone</button>
+    <div id="pick-list" style="display:flex;flex-direction:column;gap:9px">${list}</div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <input class="f-input" id="pick-add" placeholder="+ add a name" style="flex:1">
+      <button class="side-chip" id="pick-add-btn" style="padding:0 18px">Add</button>
+    </div>`;
+  $("#pick-spin").addEventListener("click",spinPick);
+  const add=()=>{ const v=$("#pick-add").value.trim(); if(!v) return; state.campfire.spinner.push(v); save(); pickWinner=null; bodyPick(); };
+  $("#pick-add-btn").addEventListener("click",add);
+  $("#pick-add").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); add(); } });
+  body.querySelectorAll(".spin-del").forEach(b=>b.addEventListener("click",()=>{
+    state.campfire.spinner.splice(+b.dataset.i,1); save(); pickWinner=null; bodyPick();
+  }));
+}
+function spinPick(){
+  const names=state.campfire.spinner;
+  if(spinning) return;
+  if(names.length<2){ toast("Add at least two names"); return; }
+  pickWinner=null;
+  const r=$("#pick-result"); if(r) r.textContent="";
+  const all=Array.prototype.slice.call($("#pick-list").querySelectorAll(".spin-name"));
+  const winner=Math.floor(Math.random()*names.length);
+  const finish=i=>{
+    all.forEach((e,j)=>{ e.classList.toggle("win",j===i); e.classList.remove("lit"); });
+    pickWinner=names[i]; if(r) r.textContent=names[i]+" is up! 🔥"; spinning=false;
+  };
+  if(CAMP_REDUCE){ finish(winner); return; }
+  spinning=true;
+  const spins=2+Math.floor(Math.random()*2);
+  const total=names.length*spins+winner+1;
+  let step=0, idx=-1;
+  (function tick(){
+    idx=(idx+1)%names.length;
+    all.forEach((e,i)=>e.classList.toggle("lit",i===idx));
+    if(++step>=total){ finish(idx); return; }
+    campTimeout(tick, 55 + Math.pow(step/total,2.6)*300);
+  })();
+}
+
+/* ════ activity · TRUTH OR DARE ════ */
+function bodyTruth(){
+  const body=$("#cf-body");
+  body.innerHTML=`
+    <div class="prompt-card" id="td-card" style="background:${tdLast?(tdLast.kind==="Truth"?"var(--sage)":"var(--kraft)"):"var(--kraft)"}">
+      <div id="td-kind" style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px">${tdLast?esc(tdLast.kind)+" — for the next person":"Choose one"}</div>
+      <div id="td-text" style="font-family:var(--disp);font-weight:800;font-size:20px;line-height:1.28">${tdLast?esc(tdLast.text):"Tap Truth or Dare to draw a card for whoever's turn it is."}</div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:18px">
+      <button class="btn-create" id="td-truth" style="flex:1;background:var(--olive)">Truth</button>
+      <button class="btn-create" id="td-dare" style="flex:1;background:var(--coral)">Dare</button>
+    </div>`;
+  $("#td-truth").addEventListener("click",()=>drawTD("Truth",TRUTHS,"var(--sage)"));
+  $("#td-dare").addEventListener("click",()=>drawTD("Dare",DARES,"var(--kraft)"));
+}
+function drawTD(kind,deck,bg){
+  const i=drawIdx(deck.length,tdIdx[kind]); tdIdx[kind]=i;
+  tdLast={kind, text:deck[i]};
+  const k=$("#td-kind"), t=$("#td-text"), card=$("#td-card");
+  if(k) k.textContent=kind+" — for the next person";
+  if(t) t.innerHTML=esc(deck[i]);
+  if(card){ card.style.background=bg; bounceTap(card); }
+}
+
+/* ════ activity · WOULD YOU RATHER ════ */
+function bodyWyr(){
+  const body=$("#cf-body");
+  body.innerHTML=`
+    <div id="wyr-card">${wyrLast?wyrCardHTML(wyrLast):`<div class="prompt-card" style="text-align:center"><div style="font-family:var(--disp);font-weight:800;font-size:20px;line-height:1.3">Would you rather…</div><div style="font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:10px">Tap draw for an impossible choice.</div></div>`}</div>
+    <button class="btn-create" id="wyr-draw" style="margin-top:18px">${wyrLast?"Another":"Draw"}</button>`;
+  $("#wyr-draw").addEventListener("click",drawWyr);
+  wireWyrVote();
+}
+function wyrCardHTML(pair){
+  const opt=(i,bg)=>`<button class="wyr-opt prompt-card" data-opt="${i}" style="min-height:0;width:100%;padding:18px;text-align:center;background:${bg};cursor:pointer"><span style="font-family:var(--disp);font-weight:800;font-size:18px;line-height:1.25">${esc(pair[i])}</span></button>`;
+  return `<div>
+    <div style="text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px">Would you rather…</div>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      ${opt(0,"var(--kraft)")}
+      <div style="text-align:center;font-family:var(--disp);font-weight:900;font-size:17px;color:var(--coral)">OR</div>
+      ${opt(1,"var(--cream)")}
+    </div></div>`;
+}
+function wireWyrVote(){
+  $("#screen-campfire").querySelectorAll(".wyr-opt").forEach(b=>b.addEventListener("click",()=>{
+    $("#screen-campfire").querySelectorAll(".wyr-opt").forEach((o,i)=>{ o.style.background=i===0?"var(--kraft)":"var(--cream)"; o.style.color="var(--ink)"; });
+    b.style.background="var(--olive)"; b.style.color="#F1ECE0"; bounceTap(b);
+  }));
+}
+function drawWyr(){ wyrIdx=drawIdx(WYR.length,wyrIdx); wyrLast=WYR[wyrIdx]; bodyWyr(); }
+
+/* ════ activity · STORY STARTER ════ */
+function bodyStory(){
+  const body=$("#cf-body");
+  body.innerHTML=`
+    <div class="prompt-card" id="story-card" style="background:var(--wood);color:#F3EAD6">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.8;margin-bottom:10px">First line</div>
+      <div id="story-text" style="font-family:var(--disp);font-weight:800;font-size:20px;line-height:1.3">${storyLast?esc(storyLast):"Tap draw for an opening line — then pass the story around the fire, each person adding a sentence."}</div>
+    </div>
+    <button class="btn-create" id="story-draw" style="margin-top:18px">${storyLast?"Another line":"Draw"}</button>`;
+  $("#story-draw").addEventListener("click",drawStory);
+}
+function drawStory(){
+  storyIdx=drawIdx(STORY_STARTERS.length,storyIdx); storyLast=STORY_STARTERS[storyIdx];
+  const t=$("#story-text"), card=$("#story-card"), btn=$("#story-draw");
+  if(t) t.innerHTML=esc(storyLast);
+  if(btn) btn.textContent="Another line";
+  if(card) bounceTap(card);
 }
 
 /* little tactile bounce on tap, for cards/rows that no longer navigate */
@@ -855,6 +1336,47 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ if(ac
 if("serviceWorker" in navigator){
   window.addEventListener("load",()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
 }
+</script>
+<script>
+"use strict";
+/* ════════════ drifting black-dot particles (non-blocking, Log screen) ════════════
+   A pointer-events:none canvas layer of slow-moving ink dots. Visible only on
+   the Log screen, wraps at the edges, and honours prefers-reduced-motion. */
+(function(){
+  const cv=document.getElementById("dot-particles"); if(!cv) return;
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches){ cv.style.display="none"; return; }
+  const ctx=cv.getContext("2d");
+  const COUNT=5, dpr=Math.min(2, window.devicePixelRatio||1);
+  let W=0,H=0,dots=[],raf=0;
+  function resize(){
+    const r=cv.getBoundingClientRect();
+    if(!r.width||!r.height) return;
+    W=r.width; H=r.height;
+    cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function mk(){ return { x:Math.random()*W||Math.random()*402, y:Math.random()*H||Math.random()*700,
+    r:8, a:1,
+    vx:(Math.random()-0.5)*0.20, vy:(Math.random()-0.5)*0.18 - 0.05 }; }
+  function init(){ dots=[]; for(let i=0;i<COUNT;i++) dots.push(mk()); }
+  function step(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<dots.length;i++){
+      const d=dots[i];
+      d.x+=d.vx; d.y+=d.vy;
+      if(d.x<-8) d.x=W+8; else if(d.x>W+8) d.x=-8;
+      if(d.y<-8) d.y=H+8; else if(d.y>H+8) d.y=-8;
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,6.2832);
+      ctx.fillStyle="rgba(35,33,28,"+d.a.toFixed(3)+")"; ctx.fill();
+    }
+    raf=requestAnimationFrame(step);
+  }
+  function start(){ if(!raf) raf=requestAnimationFrame(step); }
+  function stop(){ if(raf){ cancelAnimationFrame(raf); raf=0; } if(W&&H) ctx.clearRect(0,0,W,H); }
+  window.addEventListener("resize",()=>{ resize(); },{passive:true});
+  cv.style.display="block";
+  resize(); init(); start();
+})();
 </script>
 </body>
 </html>
