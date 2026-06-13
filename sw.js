@@ -1,6 +1,6 @@
 /* Camp Log service worker — cache-first app shell.
    Bump CACHE version whenever you change the app files. */
-const CACHE = "camplog-v1";
+const CACHE = "camplog-v2";
 const ASSETS = [
   "./",
   "./index.html",

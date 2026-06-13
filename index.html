@@ -16,612 +16,780 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-
+/* ── poster-collage palette (ported from poster-kit.jsx · POST) ── */
 :root{
-  --page:#D9DCD6; --cream:#F1ECE0; --kraft:#D9C4A1;
   --ink:#23211C; --ink-soft:#6F6757;
-  --olive:#6E7245; --olive-d:#585B36; --sage:#C4CBC2;
+  --olive:#6E7245; --olive-d:#585B36;
+  --sage:#C4CBC2; --sage-d:#AEB6AC;
   --wood:#7E5A43; --wood-d:#5C3F2C;
-  --coral:#C0734A; --coral-d:#A85E38; --yellow:#E7D656; --gray:#C9C8C1;
-  --line:#CDBE9C; --done:#9AA08C;
-  --radius:14px; --pad:18px;
-  --disp:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --kraft:#D9C4A1; --kraft-l:#E4D4B6;
+  --cream:#F1ECE0; --cream-d:#E7E0D0;
+  --coral:#C0734A; --coral-d:#A85E38;
+  --yellow:#D6C24C; --yellow-hi:#E7D656;
+  --page:#D9DCD6; --gray:#C9C8C1;
+  --disp:"Archivo",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%}
-body{font-family:var(--mono);background:var(--page);color:var(--ink);min-height:100%;line-height:1.45;overscroll-behavior-y:none}
+body{font-family:var(--mono);background:var(--page);color:var(--ink);min-height:100%;
+  line-height:1.45;overscroll-behavior-y:none;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
-input,textarea{font:inherit;color:inherit}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+input,textarea,select{font:inherit;color:inherit}
+svg{display:block}
 
-/* ---------- header ---------- */
-header{
-  position:relative; overflow:hidden;
-  padding:calc(env(safe-area-inset-top) + 42px) var(--pad) 28px;
-  background:linear-gradient(90deg,var(--sage) 0 46%, var(--olive) 46% 100%);
-}
-header .blob{position:absolute;left:-18px;top:12px;width:392px;height:208px;z-index:0;pointer-events:none}
-header .mk{position:absolute;z-index:1;pointer-events:none}
-header .mk-a{width:30px;height:30px;background:var(--ink);right:56px;top:30px}
-header .mk-b{width:30px;height:30px;background:var(--ink);right:26px;top:60px}
-header .mk-dot{width:15px;height:15px;border-radius:50%;background:var(--ink);right:42px;top:102px}
-header h1{
-  position:relative;z-index:2;display:inline-block;white-space:nowrap;
-  font-family:var(--disp);font-weight:900;text-transform:uppercase;
-  letter-spacing:-.035em;line-height:.9;
-  font-size:clamp(1.9rem,8vw,2.8rem);color:var(--gray);
-}
-header h1 .flag{display:none}
-.statline{position:relative;z-index:2;margin-top:12px;font-family:var(--mono);font-size:.74rem;letter-spacing:.03em;color:var(--ink)}
-.statline b{font-weight:700;color:var(--coral-d)}
+#app{position:relative;width:100%;max-width:402px;margin:0 auto;min-height:100vh;
+  padding-top:var(--safe-top);padding-bottom:calc(var(--safe-bot) + 132px);overflow-x:clip}
+.screen{display:none}
+.screen.active{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){.screen.active{animation:none}*{transition:none !important}}
 
-/* ---------- layout / tabs ---------- */
-main{padding:calc(var(--pad) + 4px) var(--pad) calc(env(safe-area-inset-bottom) + 110px);max-width:640px;margin:0 auto}
-.view{display:none}
-.view.active{display:block;animation:fade .18s ease}
-@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){.view.active{animation:none}*{transition:none !important}}
-nav.tabbar{
-  position:fixed;left:0;right:0;bottom:0;z-index:30;
-  display:flex;justify-content:space-around;
-  background:var(--cream);border-top:2px solid var(--ink);
-  padding:10px 8px calc(env(safe-area-inset-bottom) + 12px);
-}
-nav.tabbar button{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
-  font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--ink-soft);padding:4px 0;
-}
-nav.tabbar button svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-nav.tabbar button.active{color:var(--coral)}
-nav.tabbar button.active svg{fill:currentColor}
-nav.tabbar button:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:8px}
+/* ── giant typographic wordmark / labels ── */
+.wordmark{font-family:var(--disp);font-weight:900;line-height:.88;letter-spacing:-.03em;
+  color:var(--gray);white-space:nowrap;transform:scaleX(.96);transform-origin:left}
+.poster-label{font-family:var(--disp);font-weight:900;line-height:.9;letter-spacing:-.01em;
+  color:var(--coral);text-transform:uppercase}
 
-/* ---------- section heads ---------- */
-.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:6px 0 22px}
-.section-head h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;letter-spacing:-.015em;line-height:.92;font-size:1.7rem;color:var(--coral)}
-.section-head .tool{font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
-.section-head .tool:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+/* ── chips / highlighter ── */
+.chip{display:inline-block;background:var(--wood);color:#F3EAD6;font-family:var(--mono);font-weight:600;
+  font-size:12px;letter-spacing:.04em;padding:3px 9px;white-space:nowrap}
+.chip.off{background:transparent;color:var(--ink-soft);box-shadow:inset 0 0 0 1.5px var(--sage-d)}
+.chip-btn{border:none;cursor:pointer;padding:0;background:transparent}
+.hl{display:inline-block;position:relative;transform:rotate(-1.5deg)}
+.hl::before{content:"";position:absolute;inset:8% -6% 6% -6%;background:var(--yellow-hi);z-index:0;
+  clip-path:polygon(1% 8%,99% 0%,100% 88%,2% 100%)}
+.hl b{position:relative;z-index:1;font-family:var(--mono);font-weight:600;font-size:12px;color:var(--ink);letter-spacing:.02em}
 
-/* ---------- tag filter ---------- */
-.tagrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;margin-bottom:8px;scrollbar-width:none}
-.tagrow::-webkit-scrollbar{display:none}
-.chip{
-  flex:0 0 auto;font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.02em;
-  padding:5px 11px;border-radius:0;border:1.5px solid var(--line);background:var(--cream);color:var(--ink-soft);
-}
-.chip.on{background:var(--wood);border-color:var(--wood);color:var(--cream)}
-.chip:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+/* ── paper card ── */
+.paper{position:relative;background:var(--cream);border-radius:14px;
+  box-shadow:0 14px 30px rgba(34,30,24,.22),0 2px 6px rgba(34,30,24,.14)}
 
-/* ---------- trail timeline ---------- */
-.trail{position:relative;padding-left:30px}
-.trail::before{content:"";position:absolute;left:11px;top:8px;bottom:8px;width:2px;
-  background:repeating-linear-gradient(var(--line) 0 6px, transparent 6px 12px)}
-.stop{position:relative;margin-bottom:16px}
-.stop .blaze{position:absolute;left:-25px;top:18px;width:14px;height:14px;background:var(--coral);box-shadow:0 0 0 4px var(--page)}
-.stop.upcoming .blaze{background:var(--cream);border:2px solid var(--olive)}
-.stop.now .blaze{background:var(--olive)}
-.card{
-  background:var(--cream);border:none;border-radius:var(--radius);
-  padding:14px 15px;text-align:left;width:100%;display:block;
-  box-shadow:0 8px 20px rgba(34,30,24,.10),0 1px 3px rgba(34,30,24,.08);
-}
-.card:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
-.card .dates{font-family:var(--mono);font-size:.7rem;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase}
-.card .dates .nights{color:var(--coral);font-weight:700}
-.stop.upcoming .card .dates .nights{color:var(--olive)}
-.card h3{font-family:var(--disp);font-weight:800;font-size:1.18rem;letter-spacing:-.01em;margin:3px 0 2px;color:var(--ink)}
-.card .place{font-family:var(--mono);font-size:.78rem;color:var(--ink-soft)}
-.card .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-.card .tags span{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.02em;padding:2px 8px;background:var(--kraft);color:var(--wood-d)}
-.stop.upcoming .card .tags span{background:var(--sage);color:var(--olive-d)}
-.card .notes{font-family:var(--mono);font-size:.78rem;line-height:1.5;color:var(--ink-soft);margin-top:9px;white-space:pre-wrap}
+/* ── swipe row ── */
+.swipe{position:relative;overflow:hidden}
+.swipe-actions{position:absolute;inset:0;display:flex;justify-content:flex-end}
+.swipe-actions button{width:74px;border:none;cursor:pointer;font-family:var(--mono);
+  font-size:11px;font-weight:700;letter-spacing:.1em;color:#F1ECE0}
+.swipe-edit{background:var(--olive)}
+.swipe-del{background:var(--coral-d)}
+.swipe-fore{position:relative;will-change:transform;touch-action:pan-y;background:var(--cream)}
 
-.here{position:relative;display:flex;align-items:center;gap:10px;margin:22px 0 22px -30px;padding-left:4px}
-.here .pin{width:16px;height:16px;flex:0 0 auto;background:var(--coral);
-  clip-path:polygon(50% 100%, 0 18%, 100% 18%);box-shadow:0 0 0 4px var(--page);margin-left:3px}
-.here span{font-family:var(--mono);font-size:.66rem;font-weight:700;letter-spacing:.18em;color:var(--coral)}
-.here::after{content:"";flex:1;border-top:2px solid var(--coral);opacity:.4}
+/* ── floating seal (FAB) ── */
+.fab-host{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:402px;
+  bottom:0;height:0;z-index:29;pointer-events:none}
+.fab{position:absolute;right:14px;bottom:calc(var(--safe-bot) + 92px);border:none;background:transparent;
+  cursor:pointer;padding:0;pointer-events:auto;transition:transform .12s}
+.fab.press{transform:scale(.93)}
+.fab[hidden]{display:none}
 
-.empty{text-align:center;color:var(--ink-soft);font-family:var(--mono);font-size:.82rem;line-height:1.55;
-  padding:42px 22px;border:2px dashed var(--line);border-radius:var(--radius)}
-.empty b{display:block;font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:1.2rem;color:var(--coral);margin-bottom:6px}
+/* ── geo tab bar ── */
+nav.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:402px;z-index:30;
+  background:var(--cream);border-top:2px solid var(--ink);padding:12px 6px calc(var(--safe-bot) + 14px);display:flex}
+.tabbar .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--ink-soft);
+  font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.tabbar .tab.active{color:var(--coral)}
+.tabbar .tab:focus-visible{outline:2px solid var(--coral);outline-offset:3px;border-radius:6px}
 
-/* ---------- FAB (starburst seal) ---------- */
-.fab{
-  position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom) + 86px);z-index:25;
-  width:72px;height:72px;display:flex;align-items:center;justify-content:center;
-  filter:drop-shadow(0 6px 14px rgba(34,30,24,.32));
-}
-.fab .seal{position:absolute;inset:0;width:100%;height:100%}
-.fab .seal polygon{fill:var(--ink)}
-.fab .plus{position:relative;z-index:1;font-family:var(--disp);font-weight:800;font-size:1.7rem;line-height:1;color:var(--cream);transform:translateY(-1px)}
-.fab:focus-visible{outline:none}
-.fab:focus-visible .seal polygon{stroke:var(--coral);stroke-width:4}
+/* ── bottom sheet ── */
+.sheet-backdrop{position:fixed;inset:0;background:rgba(34,30,24,.5);z-index:40;opacity:0;
+  pointer-events:none;transition:opacity .25s}
+.sheet-backdrop.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:402px;z-index:41;background:var(--cream);
+  border-radius:22px 22px 0 0;box-shadow:0 -16px 40px rgba(34,30,24,.35);overflow:hidden;
+  max-height:94vh;overflow-y:auto;transform:translateX(-50%) translateY(110%);
+  transition:transform .32s cubic-bezier(.2,.85,.25,1)}
+.sheet.open{transform:translateX(-50%) translateY(0)}
+.sheet-grab{width:44px;height:5px;border-radius:3px;background:var(--sage-d);margin:0 auto 16px}
+.sheet-body{position:relative;z-index:2;padding:22px 22px calc(var(--safe-bot) + 26px)}
+.sheet-head{display:flex;align-items:flex-start;justify-content:space-between}
+.sheet-rule{height:2.5px;background:var(--ink);margin:16px 0 18px}
+.btn-close{width:34px;height:34px;border:2px solid var(--ink);border-radius:9px;background:transparent;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 
-/* ---------- lists (checklist / todo) ---------- */
-ul.items{list-style:none;display:flex;flex-direction:column;gap:10px}
-ul.items li{
-  display:flex;align-items:center;gap:12px;
-  background:var(--cream);border:none;border-radius:12px;padding:12px 13px;
-  box-shadow:0 6px 16px rgba(34,30,24,.08);
-}
-.tick{width:26px;height:26px;flex:0 0 auto;border-radius:7px;border:2.4px solid var(--line);background:transparent;
-  display:flex;align-items:center;justify-content:center}
-.tick svg{width:14px;height:14px;stroke:var(--cream);stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0}
-li.done .tick{background:var(--coral);border-color:var(--coral)}
-li.done .tick svg{opacity:1}
-li .txt{flex:1;font-family:var(--mono);font-size:.85rem;font-weight:600;letter-spacing:.02em;text-transform:uppercase;word-break:break-word;color:var(--ink)}
-li.done .txt{color:var(--ink-soft);text-decoration:line-through;text-decoration-color:var(--coral);text-decoration-thickness:2px}
-li .del{font-family:var(--mono);color:var(--ink-soft);font-size:1.05rem;padding:4px 6px;opacity:.6}
-.tick:focus-visible,li .del:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
-.addrow{display:flex;gap:8px;margin-bottom:16px}
-.addrow input{flex:1;padding:12px 13px;border-radius:12px;border:1.5px solid var(--line);background:var(--cream);font-family:var(--mono);font-size:.86rem}
-.addrow input:focus{outline:2px solid var(--olive);outline-offset:1px}
-.addrow button{padding:0 16px;border-radius:12px;background:var(--ink);color:var(--cream);font-family:var(--disp);font-weight:800;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase}
-.addrow button:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+/* ── underline fields ── */
+.f-field{display:block;margin-bottom:16px}
+.f-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink-soft);
+  text-transform:uppercase;margin-bottom:6px}
+.f-input{width:100%;border:none;border-bottom:2px solid var(--ink);background:transparent;
+  padding:5px 2px;outline:none;font-family:var(--mono);font-weight:600;font-size:15px;
+  letter-spacing:.02em;color:var(--ink);min-height:34px}
+.f-input.big{font-family:var(--disp);font-weight:800;font-size:24px;letter-spacing:-.01em}
+.f-input::placeholder{color:var(--sage-d)}
+textarea.f-input{resize:vertical;min-height:60px;border:1.5px solid var(--ink);border-radius:10px;padding:9px 10px}
+.f-row{display:flex;gap:16px}
 
-/* ---------- sheet (add/edit trip) ---------- */
-.sheet-backdrop{position:fixed;inset:0;background:rgba(34,30,24,.5);z-index:40;display:none}
-.sheet-backdrop.open{display:block}
-.sheet{
-  position:fixed;left:0;right:0;bottom:0;z-index:41;
-  background:var(--cream);border-radius:22px 22px 0 0;
-  padding:20px var(--pad) calc(env(safe-area-inset-bottom) + 20px);
-  max-height:88vh;overflow-y:auto;
-  transform:translateY(105%);transition:transform .26s cubic-bezier(.2,.85,.25,1);
-  max-width:640px;margin:0 auto;box-shadow:0 -16px 40px rgba(34,30,24,.3);
-}
-.sheet.open{transform:none}
-.sheet h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;letter-spacing:-.01em;font-size:1.6rem;color:var(--coral);margin-bottom:16px}
-.field{margin-bottom:14px}
-.field label{display:block;font-family:var(--mono);font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
-.field input,.field textarea{width:100%;padding:11px 13px;border-radius:12px;border:1.5px solid var(--line);background:var(--page);font-family:var(--mono);font-size:.9rem}
-.field input:focus,.field textarea:focus{outline:2px solid var(--olive);outline-offset:1px}
-.field textarea{min-height:74px;resize:vertical}
-.daterow{display:flex;gap:10px}
-.daterow .field{flex:1}
-.tagsugg{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.sheet-actions{display:flex;gap:10px;margin-top:8px}
-.btn{flex:1;padding:14px;border-radius:13px;font-family:var(--disp);font-weight:800;font-size:.95rem;letter-spacing:.03em;text-transform:uppercase;text-align:center}
-.btn.primary{background:var(--coral);color:#F6EFE2}
-.btn.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink)}
-.btn.danger{background:none;color:var(--coral-d);font-family:var(--mono);font-weight:700;text-transform:uppercase;font-size:.76rem;letter-spacing:.06em;margin-top:12px;width:100%}
-.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.btn-create{width:100%;border:none;cursor:pointer;background:var(--coral);color:#F6EFE2;font-family:var(--disp);
+  font-weight:900;font-size:18px;letter-spacing:.02em;text-transform:uppercase;padding:15px 0;border-radius:12px}
+.btn-create:active{transform:scale(.99)}
+.btn-delete{width:100%;background:none;color:var(--coral-d);font-family:var(--mono);font-weight:700;
+  text-transform:uppercase;font-size:12px;letter-spacing:.1em;padding:13px 0;margin-top:8px;cursor:pointer}
 
-/* ---------- footer tools + toast ---------- */
-.datatools{margin-top:28px;display:flex;justify-content:center;gap:20px;font-family:var(--mono);font-size:.72rem;color:var(--ink-soft)}
-.datatools button{font-weight:600;text-decoration:underline;text-underline-offset:3px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+/* ── content sheet zone (flow-root blocks margin-collapse so the brown band + label overlap as designed, without clipping the bleeding marks) ── */
+.sheet-zone{position:relative;display:flow-root;padding-bottom:8px}
+
+/* ── helper / footer text ── */
+.helper{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink-soft);text-transform:uppercase}
+.helper button{font:inherit;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px;letter-spacing:.12em;cursor:pointer}
+.empty-note{font-family:var(--mono);font-size:13px;color:var(--ink-soft);text-align:center;padding:18px 8px;line-height:1.6}
+
+/* ── toast ── */
 .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);
-  bottom:calc(env(safe-area-inset-bottom) + 150px);z-index:60;
-  background:var(--ink);color:var(--cream);padding:10px 18px;border-radius:999px;
-  font-family:var(--mono);font-size:.76rem;font-weight:600;
+  bottom:calc(var(--safe-bot) + 168px);z-index:60;background:var(--ink);color:var(--cream);
+  padding:10px 18px;border-radius:999px;font-family:var(--mono);font-size:.76rem;font-weight:600;
   opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
 </style>
 </head>
 <body>
 
-<header>
-  <svg class="blob" viewBox="0 0 240 196" aria-hidden="true"><path fill="#23211C" d="M58 14 C92 -2 120 6 138 12 C150 4 170 2 178 18 C196 16 210 30 206 50 C224 60 232 84 218 102 C228 122 214 146 192 148 C184 168 158 174 140 164 C120 178 92 176 78 160 C52 168 26 154 26 130 C6 122 -2 96 14 78 C2 56 18 30 42 30 C44 18 50 16 58 14 Z"/></svg>
-  <span class="mk mk-a" aria-hidden="true"></span>
-  <span class="mk mk-b" aria-hidden="true"></span>
-  <span class="mk mk-dot" aria-hidden="true"></span>
-  <h1><span class="flag" aria-hidden="true"></span>Camp Log</h1>
-  <p class="statline mono" id="statline"></p>
-</header>
-
-<main>
-  <!-- TRIPS -->
-  <section class="view active" id="view-trips" aria-label="Trips">
-    <div class="tagrow" id="tagrow"></div>
-    <div id="timeline"></div>
-    <div class="datatools">
-      <button id="btn-export">Export backup</button>
-      <button id="btn-import">Import backup</button>
-      <input type="file" id="import-file" accept="application/json,.json" hidden>
-    </div>
-  </section>
-
-  <!-- CHECKLIST -->
-  <section class="view" id="view-checklist" aria-label="Packing checklist">
-    <div class="section-head">
-      <h2>Packing</h2>
-      <button class="tool" id="btn-reset-checks">Uncheck all</button>
-    </div>
-    <div class="addrow">
-      <input id="check-input" type="text" placeholder="Add gear…" enterkeyhint="done" aria-label="New checklist item">
-      <button id="check-add">Add</button>
-    </div>
-    <ul class="items" id="checklist"></ul>
-  </section>
-
-  <!-- TODO -->
-  <section class="view" id="view-todo" aria-label="To-do list">
-    <div class="section-head">
-      <h2>To-do</h2>
-      <button class="tool" id="btn-clear-done">Clear done</button>
-    </div>
-    <div class="addrow">
-      <input id="todo-input" type="text" placeholder="Add a task…" enterkeyhint="done" aria-label="New task">
-      <button id="todo-add">Add</button>
-    </div>
-    <ul class="items" id="todolist"></ul>
-  </section>
-</main>
-
-<button class="fab" id="fab" aria-label="Add trip"><svg class="seal" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,2 59.83,13.3 74,8.43 76.9,23.1 91.57,26 86.7,40.17 98,50 86.7,59.83 91.57,74 76.9,76.9 74,91.57 59.83,86.7 50,98 40.17,86.7 26,91.57 23.1,76.9 8.43,74 13.3,59.83 2,50 13.3,40.17 8.43,26 23.1,23.1 26,8.43 40.17,13.3"/></svg><span class="plus" aria-hidden="true">+</span></button>
-
-<nav class="tabbar" aria-label="Sections">
-  <button data-view="trips" class="active">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L21 20 L3 20 Z"/></svg>
-    Trips
-  </button>
-  <button data-view="checklist">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/></svg>
-    Checklist
-  </button>
-  <button data-view="todo">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/></svg>
-    To-do
-  </button>
-</nav>
-
-<!-- add / edit trip sheet -->
-<div class="sheet-backdrop" id="backdrop"></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-  <h2 id="sheet-title">New trip</h2>
-  <div class="field">
-    <label for="f-title">Trip name</label>
-    <input id="f-title" type="text" placeholder="e.g. Lakeside long weekend">
-  </div>
-  <div class="field">
-    <label for="f-place">Place</label>
-    <input id="f-place" type="text" placeholder="e.g. Lake Sagami">
-  </div>
-  <div class="daterow">
-    <div class="field">
-      <label for="f-start">Start</label>
-      <input id="f-start" type="date">
-    </div>
-    <div class="field">
-      <label for="f-end">End</label>
-      <input id="f-end" type="date">
-    </div>
-  </div>
-  <div class="field">
-    <label for="f-tags">Tags <span style="text-transform:none;font-weight:400">(comma separated)</span></label>
-    <input id="f-tags" type="text" placeholder="lake, with family, autumn">
-    <div class="tagsugg" id="tagsugg"></div>
-  </div>
-  <div class="field">
-    <label for="f-notes">Notes</label>
-    <textarea id="f-notes" placeholder="Campsite number, weather, what to remember next time…"></textarea>
-  </div>
-  <div class="sheet-actions">
-    <button class="btn ghost" id="btn-cancel">Cancel</button>
-    <button class="btn primary" id="btn-save">Save trip</button>
-  </div>
-  <button class="btn danger" id="btn-delete" hidden>Delete this trip</button>
+<div id="app">
+  <section class="screen active" id="screen-log" aria-label="Log"></section>
+  <section class="screen" id="screen-packing" aria-label="Packing"></section>
+  <section class="screen" id="screen-todo" aria-label="To-do"></section>
+  <section class="screen" id="screen-campfire" aria-label="Campfire"></section>
 </div>
 
+<div class="fab-host"><button class="fab" id="fab"></button></div>
+
+<nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
+
+<div class="sheet-backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+
 <div class="toast" id="toast" role="status"></div>
+<input type="file" id="import-file" accept="application/json,.json" hidden>
 
 <script>
 "use strict";
-const KEY = "camplog.v1";
-const $ = (s) => document.querySelector(s);
 
-/* ---------- state ---------- */
-const DEFAULT_CHECKLIST = ["Tent + stakes","Sleeping bags","Sleeping pads","Stove + fuel","Lighter / matches","Cookware + utensils","Water","Headlamps","First aid kit","Trash bags","Power bank","Rain layer"];
-let state = load();
-function load(){
-  try{
-    const raw = localStorage.getItem(KEY);
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
+/* ════════════ colour constants (for inline SVG marks) ════════════ */
+const INK="#23211C",INKSOFT="#6F6757",OLIVE="#6E7245",OLIVED="#585B36",
+  SAGE="#C4CBC2",SAGED="#AEB6AC",WOOD="#7E5A43",WOODD="#5C3F2C",
+  KRAFT="#D9C4A1",CREAM="#F1ECE0",CORAL="#C0734A",CORALD="#A85E38",
+  YELLOW="#D6C24C",PAGE="#D9DCD6";
+
+const $ = (s,r=document) => r.querySelector(s);
+const KEY = "camplog.v1";
+
+/* ════════════ state ════════════ */
+const SEED = {
+  trips: [
+    { title:"Lakeside Long Weekend", place:"Lake Sagami", start:"2026-06-19", end:"2026-06-21",
+      tags:["lake","with family"], notes:"Site A-12 · canoe booked\nbring marshmallows" },
+    { title:"Fuji Foothills", place:"Fumotoppara", start:"2026-05-02", end:"2026-05-04", tags:["views","group"], notes:"" },
+    { title:"First Solo Overnight", place:"Doshi Valley", start:"2026-04-11", end:"2026-04-12", tags:["solo"], notes:"" },
+    { title:"Cherry Blossom Camp", place:"Lake Motosu", start:"2026-03-28", end:"2026-03-29", tags:["spring"], notes:"" },
+  ],
+  checklist: [
+    ["Tent + stakes",1],["Sleeping bags",1],["Sleeping pads",1],["Stove + fuel",1],
+    ["Lighter / matches",1],["Cookware + utensils",1],["Water",1],["Headlamps",1],
+    ["First aid kit",1],["Trash bags",0],["Power bank",0],["Rain layer",0],
+  ],
+  todos: [
+    ["Confirm canoe rental",1,"Before You Go"],["Buy marshmallows + snacks",0,"Before You Go"],
+    ["Charge power bank + lights",0,"Before You Go"],["Download offline maps",1,"Before You Go"],
+    ["Pitch tent before dark",0,"At Camp"],["Filter water from lake",0,"At Camp"],["Hang bear bag",0,"At Camp"],
+  ],
+};
+
+function seed(){
   return {
-    trips: [],
-    checklist: DEFAULT_CHECKLIST.map(t => ({id:uid(), text:t, done:false})),
-    todos: []
+    trips: SEED.trips.map(t => ({ id:uid(), ...t })),
+    checklist: SEED.checklist.map(([text,done]) => ({ id:uid(), text, done:!!done })),
+    todos: SEED.todos.map(([text,done,group]) => ({ id:uid(), text, done:!!done, group })),
   };
 }
+function migrate(s){
+  s.trips    = (s.trips||[]).map(t => ({ tags:[], notes:"", place:"", end:"", ...t }));
+  s.checklist= (s.checklist||[]).map(it => ({ done:false, ...it }));
+  s.todos    = (s.todos||[]).map(it => ({ done:false, group:it.group||"Tasks", ...it, group:it.group||"Tasks" }));
+  return s;
+}
+function load(){
+  try{ const raw = localStorage.getItem(KEY); if(raw) return migrate(JSON.parse(raw)); }catch(e){}
+  return seed();
+}
+let state = load();
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
-/* ---------- helpers ---------- */
-function todayStr(){
-  const d = new Date();
-  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+/* ════════════ date / format helpers ════════════ */
+const MON = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+const MONT= ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function todayStr(){ const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function dParts(s){ const [y,m,d]=s.split("-").map(Number); return {y,m:m-1,d}; }
+function nights(start,end){ if(!end) return 0;
+  return Math.max(0, Math.round((new Date(end+"T00:00") - new Date(start+"T00:00"))/86400000)); }
+function dayRange(start,end){
+  const a=dParts(start);
+  if(!end || end===start) return String(a.d);
+  const b=dParts(end);
+  if(a.m===b.m && a.y===b.y) return a.d+"–"+b.d;
+  return a.d+"–"+MONT[b.m]+" "+b.d;
 }
-function fmtRange(start, end){
-  const f = (s, withYear) => {
-    const d = new Date(s + "T00:00");
-    const opts = {month:"short", day:"numeric"};
-    if(withYear) opts.year = "2-digit";
-    return new Intl.DateTimeFormat("en", opts).format(d);
-  };
-  if(!end || end === start) return f(start, true);
-  const sameMonth = start.slice(0,7) === end.slice(0,7);
-  if(sameMonth){
-    return f(start, false) + "–" + new Date(end+"T00:00").getDate() + " ’" + start.slice(2,4);
+function listDate(t){
+  const a=dParts(t.start); const n=nights(t.start,t.end);
+  const yr="’"+t.start.slice(2,4);
+  const nn = n>0 ? " · "+n+"N" : "";
+  return MON[a.m]+" "+dayRange(t.start,t.end)+" "+yr+nn;
+}
+function countdown(start){
+  const days = Math.round((new Date(start+"T00:00") - new Date(todayStr()+"T00:00"))/86400000);
+  if(days<0) return "";
+  if(days===0) return "TODAY";
+  if(days===1) return "TOMORROW";
+  if(days<14) return "IN "+days+" DAYS";
+  return "IN "+Math.round(days/7)+" WEEKS";
+}
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1800); }
+
+/* ════════════ decoration builders (ported from poster-kit.jsx) ════════════ */
+function block(x,y,w,h,bg,z,extra){
+  return `<div style="position:absolute;left:${x};top:${y};width:${w};height:${h};background:${bg};z-index:${z||0};${extra||""}"></div>`;
+}
+function blobHTML(w,rot,style){
+  const h=Math.round(w*0.82);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 240 196" style="transform:rotate(${rot}deg);${style||""}" aria-hidden="true"><path fill="${INK}" d="M58 14 C92 -2 120 6 138 12 C150 4 170 2 178 18 C196 16 210 30 206 50 C224 60 232 84 218 102 C228 122 214 146 192 148 C184 168 158 174 140 164 C120 178 92 176 78 160 C52 168 26 154 26 130 C6 122 -2 96 14 78 C2 56 18 30 42 30 C44 18 50 16 58 14 Z"></path></svg>`;
+}
+function dotHTML(size,color,style){
+  return `<div style="position:absolute;width:${size}px;height:${size}px;border-radius:50%;background:${color};${style||""}"></div>`;
+}
+const TETRO={ l:[[0,0],[0,1],[0,2],[1,2]], s:[[1,0],[0,1],[1,1],[0,2]],
+  t:[[0,0],[1,0],[2,0],[1,1]], step:[[1,0],[0,1],[1,1],[0,2],[1,2]] };
+function tetroHTML(shape,s,color,style){
+  const cells=TETRO[shape]||TETRO.l;
+  const cols=Math.max(...cells.map(c=>c[0]))+1, rows=Math.max(...cells.map(c=>c[1]))+1;
+  const inner=cells.map(([c,r])=>`<div style="position:absolute;left:${c*s}px;top:${r*s}px;width:${s}px;height:${s}px;background:${color}"></div>`).join("");
+  return `<div style="position:absolute;width:${s*cols}px;height:${s*rows}px;${style||""}" aria-hidden="true">${inner}</div>`;
+}
+function waveHTML(w,h,color,sw,lines,style){
+  let paths="";
+  for(let i=0;i<lines;i++){
+    const y=h*(0.28+i*(0.44/Math.max(1,lines-1)));
+    const amp=18-i*2;
+    const d=`M -10 ${y} C ${w*0.22} ${y-amp}, ${w*0.34} ${y+amp}, ${w*0.52} ${y-amp*0.4} S ${w*0.82} ${y+amp}, ${w+10} ${y-amp*0.5}`;
+    paths+=`<path d="${d}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"></path>`;
   }
-  return f(start, false) + " – " + f(end, true);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="${style||""}" aria-hidden="true">${paths}</svg>`;
 }
-function nights(start, end){
-  if(!end) return 0;
-  return Math.max(0, Math.round((new Date(end+"T00:00") - new Date(start+"T00:00")) / 86400000));
+function squiggleHTML(w,color,sw,style){
+  return `<svg width="${w}" height="${Math.round(w*1.15)}" viewBox="0 0 150 172" style="position:absolute;${style||""}" aria-hidden="true"><path fill="none" stroke="${color}" stroke-width="${sw||11}" stroke-linecap="round" stroke-linejoin="round" d="M14 26 C14 8 40 6 52 16 C66 28 50 48 32 46 C10 44 6 70 26 78 C50 88 78 70 70 46 C64 28 86 20 100 32 C118 47 102 78 78 96 C50 117 78 138 104 128 C126 120 140 138 132 156"></path></svg>`;
 }
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function arrowTileHTML(size,style){
+  const a=Math.round(size*0.62);
+  return `<div style="position:absolute;width:${size}px;height:${size}px;background:${YELLOW};display:flex;align-items:center;justify-content:center;${style||""}" aria-hidden="true"><svg width="${a}" height="${a}" viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5 L19 19 M19 9 V19 H9"></path></svg></div>`;
 }
-function toast(msg){
-  const t = $("#toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(t._h);
-  t._h = setTimeout(()=> t.classList.remove("show"), 1800);
+function infoDotHTML(size,style){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 26 26" style="${style||""}" aria-hidden="true"><rect x="1.2" y="1.2" width="23.6" height="23.6" rx="7" fill="none" stroke="${INK}" stroke-width="1.8"></rect><circle cx="13" cy="8.4" r="1.5" fill="${INK}"></circle><path d="M13 12.2 V18.4" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"></path></svg>`;
+}
+/* die-cut starburst seal */
+function sealPoints(points){ const pts=[];
+  for(let i=0;i<points*2;i++){ const a=(i/(points*2))*Math.PI*2 - Math.PI/2; const r=i%2===0?50:41;
+    pts.push((50+Math.cos(a)*r).toFixed(2)+","+(50+Math.sin(a)*r).toFixed(2)); }
+  return pts.join(" "); }
+const SEAL_PTS = sealPoints(16);
+function sealHTML(lines,size,bg){
+  const fs=(size*0.18).toFixed(1);
+  return `<div style="position:relative;width:${size}px;height:${size}px;transform:rotate(-6deg)">
+    <svg width="${size}" height="${size}" viewBox="0 0 100 100" style="display:block;filter:drop-shadow(0 6px 12px rgba(34,30,24,.3))" aria-hidden="true"><polygon points="${SEAL_PTS}" fill="${bg}"></polygon></svg>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-7deg)">
+      ${lines.map(l=>`<span style="font-family:var(--disp);font-weight:800;font-size:${fs}px;line-height:1.02;letter-spacing:.01em;color:#F1ECE0">${l}</span>`).join("")}
+    </div></div>`;
 }
 
-/* ---------- tabs ---------- */
-document.querySelectorAll("nav.tabbar button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll("nav.tabbar button").forEach(b => b.classList.toggle("active", b === btn));
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    $("#view-" + btn.dataset.view).classList.add("active");
-    $("#fab").style.display = btn.dataset.view === "trips" ? "flex" : "none";
-    window.scrollTo({top:0});
+/* tag chips / highlighter for cards */
+function chipHTML(text){ return `<span class="chip">${esc(text)}</span>`; }
+function hlHTML(text){ return `<span class="hl"><b>${esc(text)}</b></span>`; }
+
+/* ════════════ SCREEN 1 · LOG ════════════ */
+function nextOutCard(t){
+  if(!t){
+    return `<div class="paper" style="position:absolute;left:16px;top:398px;width:352px;z-index:6">
+      <div style="padding:24px 20px">
+        <div class="poster-label" style="font-size:26px">Nothing planned</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:8px;line-height:1.5">Tap the NEW LOG seal to plan your next trip — past or upcoming.</div>
+      </div></div>`;
+  }
+  const a=dParts(t.start), n=nights(t.start,t.end);
+  const tagBits=[];
+  if(t.tags&&t.tags[0]) tagBits.push(chipHTML(t.tags[0]));
+  if(t.tags&&t.tags[1]) tagBits.push(hlHTML(t.tags[1]));
+  const note = t.notes ? `<div style="font-family:var(--mono);font-size:13px;line-height:1.5;margin-top:12px;text-transform:uppercase">${esc(t.notes).replace(/\n/g,"<br>")}</div>` : "";
+  return `<div class="paper trip-card" data-id="${t.id}" style="position:absolute;left:16px;top:398px;width:352px;z-index:6;cursor:pointer">
+    <div style="padding:18px 20px 16px;position:relative">
+      <div style="display:flex;align-items:flex-end;gap:14px">
+        <div>
+          <div style="font-family:var(--disp);font-weight:800;font-size:28px;line-height:.9">${MONT[a.m]}</div>
+          <div style="font-family:var(--disp);font-weight:900;font-size:46px;line-height:.86;letter-spacing:-.02em">${dayRange(t.start,t.end)}</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:15px;letter-spacing:.08em;color:var(--ink-soft);padding-bottom:6px">${n} NIGHT${n===1?"":"S"}</div>
+      </div>
+      <div style="height:2.5px;background:var(--ink);margin:12px 0 11px"></div>
+      <div style="font-family:var(--disp);font-weight:800;font-size:21px;letter-spacing:-.01em">${esc(t.title)}</div>
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:8px">
+        ${t.place?`<span style="font-family:var(--mono);font-size:14px;color:var(--ink-soft)">→ ${esc(t.place)}</span>`:""}
+        ${tagBits.join("")}
+      </div>
+      ${note}
+      <span style="position:absolute;right:16px;bottom:14px">${infoDotHTML(18)}</span>
+    </div></div>`;
+}
+
+function renderLog(){
+  const today=todayStr();
+  const sorted=[...state.trips];
+  const current = sorted.filter(t=> t.start<=today && (t.end||t.start)>=today).sort((a,b)=>a.start.localeCompare(b.start));
+  const upcoming= sorted.filter(t=> t.start>today).sort((a,b)=>a.start.localeCompare(b.start));
+  const nextOut = current[0] || upcoming[0] || null;
+  const rest = sorted.filter(t=> !nextOut || t.id!==nextOut.id).sort((a,b)=>b.start.localeCompare(a.start));
+  const cd = nextOut ? countdown(nextOut.start) : "";
+
+  const rows = rest.length ? rest.map(t=>`
+    <div class="swipe trip-swipe" data-id="${t.id}">
+      <div class="swipe-actions"><button class="swipe-edit" data-act="edit">EDIT</button><button class="swipe-del" data-act="del">DELETE</button></div>
+      <div class="swipe-fore" style="background:var(--kraft);padding:14px 8px 14px 0">
+        <div style="font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink-soft)">${listDate(t)}</div>
+        <div style="font-family:var(--disp);font-weight:800;font-size:23px;letter-spacing:-.015em;color:var(--wood-d);margin-top:3px">${esc(t.title)}</div>
+        ${t.place?`<div style="font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:2px">${esc(t.place)}</div>`:""}
+      </div>
+    </div>`).join("")
+    : `<div class="empty-note">No other trips logged yet.</div>`;
+
+  $("#screen-log").innerHTML = `
+    <div id="log-hero" style="position:relative;height:640px">
+      ${block("0","calc(-1*var(--safe-top))","51%","calc(452px + var(--safe-top))",SAGE,0)}
+      ${block("51%","calc(-1*var(--safe-top))","49%","calc(452px + var(--safe-top))",OLIVE,0)}
+      ${blobHTML(206,-4,"position:absolute;left:18px;top:28px;z-index:4")}
+      ${tetroHTML("s",22,INK,"left:300px;top:150px;z-index:4")}
+      ${block("300px","300px","62px","62px",CORAL,3)}
+      ${tetroHTML("t",24,INK,"left:286px;top:322px;z-index:4")}
+      ${dotHTML(18,INK,"left:296px;top:104px;z-index:4")}
+      ${dotHTML(14,INK,"left:384px;top:252px;z-index:4")}
+      ${arrowTileHTML(56,"left:22px;top:156px;z-index:5")}
+      <div class="wordmark" style="position:absolute;left:18px;top:84px;z-index:5;font-size:58px">CAMP LOG</div>
+      <div style="position:absolute;right:14px;top:344px;z-index:8;text-align:right">
+        <div class="poster-label" style="font-size:40px">Next Out</div>
+        ${cd?`<div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--coral-d);margin-top:4px">${cd}</div>`:""}
+      </div>
+      ${nextOutCard(nextOut)}
+    </div>
+
+    <div class="sheet-zone" style="margin-top:6px">
+      <div style="position:absolute;left:150px;top:0;width:218px;bottom:0;background:${OLIVE};z-index:0"></div>
+      <div style="position:absolute;left:-4px;top:0;width:326px;height:120px;background:${WOOD};z-index:3;overflow:hidden">
+        ${waveHTML(326,120,INK,12,3)}
+      </div>
+      <div class="poster-label" style="position:absolute;left:30px;top:36px;font-size:40px;z-index:8">Trips</div>
+      <div style="position:relative;z-index:2;margin:64px 34px 0;background:${KRAFT};box-shadow:0 10px 26px rgba(34,30,24,.16);padding:42px 22px 22px">
+        ${tetroHTML("step",18,INK,"right:8px;top:14px;z-index:4")}
+        ${dotHTML(15,INK,"right:30px;top:120px;z-index:4")}
+        ${squiggleHTML(96,INK,11,"left:-12px;bottom:-12px;z-index:1")}
+        <div style="position:relative;z-index:5">${rows}</div>
+      </div>
+      <div class="helper" style="margin-top:18px">
+        <button id="btn-export">Export backup</button> · <button id="btn-import">Import backup</button>
+      </div>
+    </div>`;
+
+  // wire next-out card → edit
+  $("#screen-log").querySelectorAll(".trip-card").forEach(c=>{
+    c.addEventListener("click",()=> openTripSheet(c.dataset.id));
   });
-});
-
-/* ---------- trips ---------- */
-let activeTag = null;
-
-function allTags(){
-  const set = new Set();
-  state.trips.forEach(t => (t.tags||[]).forEach(g => set.add(g)));
-  return [...set].sort((a,b)=> a.localeCompare(b));
+  // wire trip swipe rows
+  $("#screen-log").querySelectorAll(".trip-swipe").forEach(row=>{
+    const id=row.dataset.id;
+    attachSwipe(row,{
+      onTap:()=> openTripSheet(id),
+      onEdit:()=> openTripSheet(id),
+      onDelete:()=> deleteTrip(id),
+    });
+  });
+  $("#btn-export").addEventListener("click",exportBackup);
+  $("#btn-import").addEventListener("click",()=>$("#import-file").click());
+  sizeLogHero();
+}
+/* size the Log hero so the (variable-height) Next Out card never crowds the Trips sheet */
+function sizeLogHero(){
+  const hero=$("#log-hero"), card=$("#screen-log .paper");
+  if(hero && card) hero.style.height = (card.offsetTop + card.offsetHeight + 30) + "px";
 }
 
-function renderTagRow(){
-  const tags = allTags();
-  const row = $("#tagrow");
-  if(!tags.length){ row.innerHTML = ""; return; }
-  row.innerHTML = `<button class="chip ${activeTag===null?"on":""}" data-tag="">All</button>` +
-    tags.map(g => `<button class="chip ${activeTag===g?"on":""}" data-tag="${escapeHtml(g)}">${escapeHtml(g)}</button>`).join("");
-  row.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
-    activeTag = c.dataset.tag || null;
-    renderTrips();
-  }));
+/* ════════════ SCREEN 2 · PACKING ════════════ */
+function renderPacking(){
+  const items=state.checklist;
+  const packed=items.filter(x=>x.done).length;
+  const allSet=packed===items.length && items.length>0;
+
+  const rows = items.length ? items.map(it=>`
+    <div class="swipe pack-swipe" data-id="${it.id}">
+      <div class="swipe-actions"><button class="swipe-edit" data-act="edit">EDIT</button><button class="swipe-del" data-act="del">DELETE</button></div>
+      <div class="swipe-fore" style="display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-bottom:1px solid rgba(34,30,24,.13);user-select:none">
+        <span style="font-family:var(--mono);font-size:14.5px;font-weight:${it.done?500:600};letter-spacing:.04em;text-transform:uppercase;text-align:center;color:${it.done?"var(--ink-soft)":"var(--ink)"};${it.done?"text-decoration:line-through;text-decoration-color:var(--coral);text-decoration-thickness:2px":""}">${esc(it.text)}</span>
+      </div>
+    </div>`).join("")
+    : `<div class="empty-note">Nothing on the manifest.<br>Tap ADD ITEM to start packing.</div>`;
+
+  $("#screen-packing").innerHTML = `
+    <div style="position:relative;height:250px">
+      ${block("0","calc(-1*var(--safe-top))","57%","calc(250px + var(--safe-top))",SAGE,0)}
+      ${block("57%","calc(-1*var(--safe-top))","43%","calc(250px + var(--safe-top))",OLIVE,0)}
+      ${blobHTML(250,-4,"position:absolute;left:-22px;top:34px;z-index:4")}
+      ${tetroHTML("l",20,INK,"right:28px;top:150px;z-index:4")}
+      ${block("300px","120px","50px","50px",CORAL,3)}
+      <div class="wordmark" style="position:absolute;left:18px;top:74px;z-index:6;font-size:58px">PACKING</div>
+    </div>
+
+    <div class="sheet-zone">
+      <div style="position:absolute;left:168px;top:0;width:238px;bottom:0;background:${OLIVE};z-index:0"></div>
+      <div style="position:absolute;left:-4px;top:0;width:250px;height:86px;background:${WOOD};z-index:3;overflow:hidden">${waveHTML(250,86,INK,9,2)}</div>
+      <div class="poster-label" style="position:absolute;left:20px;top:36px;z-index:7;font-size:26px">Gear Manifest</div>
+      <div style="position:absolute;right:24px;top:50px;z-index:7;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink-soft);text-align:right">
+        <span style="color:${allSet?"var(--coral)":"var(--ink)"};font-weight:700;font-size:15px">${packed}</span>/${items.length}<br>PACKED
+      </div>
+      <div style="position:relative;z-index:2;margin:50px 30px 0;background:${CREAM};box-shadow:0 12px 28px rgba(34,30,24,.16);padding:42px 0 4px">
+        ${dotHTML(16,INK,"right:14px;top:150px;z-index:4")}
+        ${squiggleHTML(92,INK,11,"left:-6px;bottom:-8px;z-index:1")}
+        <div style="position:relative;z-index:5;border-top:2px solid var(--ink);margin:0 18px">${rows}</div>
+        <div class="helper" style="padding:14px 18px 4px">TAP TO CROSS OFF · SWIPE LEFT TO EDIT/DELETE<br><button id="btn-reset" style="margin-top:6px">Reset all</button></div>
+      </div>
+    </div>`;
+
+  $("#screen-packing").querySelectorAll(".pack-swipe").forEach(row=>{
+    const id=row.dataset.id;
+    attachSwipe(row,{
+      onTap:()=>{ const it=state.checklist.find(x=>x.id===id); it.done=!it.done; save(); renderPacking(); },
+      onEdit:()=> openItemSheet("pack",id),
+      onDelete:()=>{ state.checklist=state.checklist.filter(x=>x.id!==id); save(); renderPacking(); },
+    });
+  });
+  $("#btn-reset").addEventListener("click",()=>{ state.checklist.forEach(it=>it.done=false); save(); renderPacking(); toast("Checklist reset"); });
 }
 
-function tripCard(t, cls){
-  const n = nights(t.start, t.end);
-  return `<div class="stop ${cls}">
-    <span class="blaze" aria-hidden="true"></span>
-    <button class="card" data-id="${t.id}" aria-label="Edit trip ${escapeHtml(t.title)}">
-      <div class="dates mono">${fmtRange(t.start, t.end)}${n ? ` · <span class="nights">${n} night${n>1?"s":""}</span>` : ""}</div>
-      <h3>${escapeHtml(t.title)}</h3>
-      ${t.place ? `<div class="place">${escapeHtml(t.place)}</div>` : ""}
-      ${(t.tags && t.tags.length) ? `<div class="tags">${t.tags.map(g=>`<span>${escapeHtml(g)}</span>`).join("")}</div>` : ""}
-      ${t.notes ? `<div class="notes">${escapeHtml(t.notes)}</div>` : ""}
-    </button>
+/* ════════════ SCREEN 3 · TO-DO ════════════ */
+function renderTodo(){
+  const today=todayStr();
+  const upcoming=state.trips.filter(t=>t.start>=today).sort((a,b)=>a.start.localeCompare(b.start));
+  const activeTitle = (upcoming[0]&&upcoming[0].title) || "Tasks";
+
+  // group todos preserving first-seen order
+  const order=[]; const byGroup={};
+  state.todos.forEach(it=>{ const g=it.group||"Tasks"; if(!byGroup[g]){byGroup[g]=[];order.push(g);} byGroup[g].push(it); });
+  const total=state.todos.length;
+  const done=state.todos.filter(x=>x.done).length;
+
+  const groupsHTML = order.length ? order.map(g=>`
+    <div style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:9px;padding:6px 22px 8px">
+        <div class="poster-label" style="font-size:20px;color:var(--wood-d)">${esc(g)}</div>
+        <div style="flex:1;height:2px;background:var(--ink);opacity:.25"></div>
+      </div>
+      ${byGroup[g].map(it=>`
+        <div class="swipe todo-swipe" data-id="${it.id}">
+          <div class="swipe-actions"><button class="swipe-edit" data-act="edit">EDIT</button><button class="swipe-del" data-act="del">DELETE</button></div>
+          <div class="swipe-fore" style="display:flex;align-items:center;gap:13px;min-height:50px;padding:0 22px;border-bottom:1px solid rgba(34,30,24,.1);user-select:none">
+            <span style="width:24px;height:24px;flex-shrink:0;border-radius:50%;border:2.4px solid ${it.done?"var(--coral)":"var(--ink-soft)"};display:flex;align-items:center;justify-content:center;background:${it.done?"var(--coral)":"transparent"}">
+              ${it.done?`<svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7 L6 11 L12 3" fill="none" stroke="#F1ECE0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>`:""}
+            </span>
+            <span style="flex:1;font-family:var(--mono);font-size:14.5px;font-weight:${it.done?500:600};letter-spacing:.02em;color:${it.done?"var(--ink-soft)":"var(--ink)"};${it.done?"text-decoration:line-through;text-decoration-color:var(--coral);text-decoration-thickness:2px":""}">${esc(it.text)}</span>
+          </div>
+        </div>`).join("")}
+    </div>`).join("")
+    : `<div class="empty-note">No tasks yet.<br>Tap ADD TASK to make a plan.</div>`;
+
+  $("#screen-todo").innerHTML = `
+    <div style="position:relative;height:236px">
+      ${block("0","calc(-1*var(--safe-top))","49%","calc(236px + var(--safe-top))",OLIVE,0)}
+      ${block("49%","calc(-1*var(--safe-top))","51%","calc(236px + var(--safe-top))",SAGE,0)}
+      ${blobHTML(224,-6,"position:absolute;right:-26px;top:32px;z-index:4")}
+      ${block("36px","150px","56px","56px",CORAL,3)}
+      ${tetroHTML("t",22,INK,"left:36px;top:150px;z-index:4")}
+      ${dotHTML(16,INK,"left:150px;top:120px;z-index:4")}
+      <div class="wordmark" style="position:absolute;right:22px;top:74px;z-index:6;font-size:62px;text-align:right">TO-DO</div>
+    </div>
+
+    <div class="sheet-zone">
+      <div style="position:absolute;left:36px;top:0;width:210px;bottom:0;background:${OLIVE};z-index:0"></div>
+      <div style="position:absolute;right:-4px;top:12px;width:232px;height:84px;background:${WOOD};z-index:3;overflow:hidden">${waveHTML(232,84,INK,9,2)}</div>
+      <div class="poster-label" style="position:absolute;left:22px;top:52px;z-index:7;font-size:26px;max-width:300px">${esc(activeTitle)}</div>
+      <div style="position:absolute;left:22px;top:88px;z-index:7;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink-soft)">
+        <span style="color:var(--coral);font-weight:700">${done}</span> OF ${total} DONE
+      </div>
+      <div style="position:relative;z-index:2;margin:64px 28px 0;background:${CREAM};box-shadow:0 12px 28px rgba(34,30,24,.16);padding:46px 0 4px">
+        ${dotHTML(15,INK,"left:14px;top:150px;z-index:4")}
+        ${squiggleHTML(92,INK,11,"right:-6px;bottom:-8px;z-index:1")}
+        <div style="position:relative;z-index:5">${groupsHTML}</div>
+        <div class="helper" style="padding:10px 18px 4px">TAP TO CHECK · SWIPE LEFT TO EDIT/DELETE<br><button id="btn-clear" style="margin-top:6px">Clear done</button></div>
+      </div>
+    </div>`;
+
+  $("#screen-todo").querySelectorAll(".todo-swipe").forEach(row=>{
+    const id=row.dataset.id;
+    attachSwipe(row,{
+      onTap:()=>{ const it=state.todos.find(x=>x.id===id); it.done=!it.done; save(); renderTodo(); },
+      onEdit:()=> openItemSheet("todo",id),
+      onDelete:()=>{ state.todos=state.todos.filter(x=>x.id!==id); save(); renderTodo(); },
+    });
+  });
+  $("#btn-clear").addEventListener("click",()=>{ state.todos=state.todos.filter(it=>!it.done); save(); renderTodo(); toast("Cleared done"); });
+}
+
+/* ════════════ SCREEN 4 · CAMPFIRE (placeholder) ════════════ */
+function renderCampfire(){
+  $("#screen-campfire").innerHTML = `
+    <div style="position:relative;height:300px">
+      ${block("0","calc(-1*var(--safe-top))","51%","calc(250px + var(--safe-top))",OLIVE,0)}
+      ${block("51%","calc(-1*var(--safe-top))","49%","calc(250px + var(--safe-top))",SAGE,0)}
+      ${blobHTML(230,-4,"position:absolute;left:-18px;top:34px;z-index:4")}
+      ${tetroHTML("s",22,INK,"right:40px;top:150px;z-index:4")}
+      ${dotHTML(16,INK,"left:300px;top:120px;z-index:4")}
+      <div class="wordmark" style="position:absolute;left:18px;top:74px;z-index:6;font-size:50px">CAMPFIRE</div>
+      <div class="poster-label" style="position:absolute;left:20px;top:250px;z-index:7;font-size:26px">Gather Round</div>
+    </div>
+    <div class="paper" style="margin:54px 24px 0;padding:34px 24px;text-align:center">
+      <div style="display:flex;justify-content:center;margin-bottom:14px">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="${CORAL}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 C 13 7 17 8.5 17 13 a5 5 0 0 1 -10 0 C 7 9.5 10.5 8 12 3 Z"></path><path d="M5 21 h14"></path></svg>
+      </div>
+      <div class="poster-label" style="font-size:30px">Coming soon</div>
+      <div style="font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.6">
+        The campfire is still being built — stories, songs and stargazing notes will live here.
+      </div>
+    </div>`;
+}
+
+/* ════════════ swipe-row interaction (ported from SwipeRow) ════════════ */
+const SWIPE_OPEN = -148;
+function attachSwipe(rowEl, {onTap,onEdit,onDelete}){
+  const fore = rowEl.querySelector(".swipe-fore");
+  const editBtn = rowEl.querySelector('[data-act="edit"]');
+  const delBtn = rowEl.querySelector('[data-act="del"]');
+  let dx=0, startX=null, moved=false;
+  const setX=(x,anim)=>{ dx=x; fore.style.transition = anim ? "transform .22s cubic-bezier(.2,.8,.2,1)" : "none"; fore.style.transform=`translateX(${dx}px)`; };
+  const getX=e=> e.touches ? e.touches[0].clientX : e.clientX;
+  fore.addEventListener("pointerdown",e=>{ startX=getX(e)-dx; moved=false; });
+  fore.addEventListener("pointermove",e=>{ if(startX==null) return;
+    let nd=getX(e)-startX; if(nd>0)nd=0; if(nd<SWIPE_OPEN)nd=SWIPE_OPEN;
+    if(Math.abs(nd-dx)>2) moved=true; setX(nd,false); });
+  const up=()=>{ if(startX==null) return; startX=null; setX(dx<SWIPE_OPEN/2?SWIPE_OPEN:0,true); };
+  fore.addEventListener("pointerup",up);
+  fore.addEventListener("pointercancel",up);
+  fore.addEventListener("pointerleave",()=>{ if(startX!=null) up(); });
+  fore.addEventListener("click",e=>{ if(moved){ e.preventDefault(); return; }
+    if(dx<0){ setX(0,true); return; } onTap&&onTap(); });
+  editBtn&&editBtn.addEventListener("click",()=>{ setX(0,true); onEdit&&onEdit(); });
+  delBtn&&delBtn.addEventListener("click",()=> onDelete&&onDelete());
+}
+
+/* ════════════ bottom sheet framework ════════════ */
+function openSheet(html){ const s=$("#sheet"); s.innerHTML=html; $("#backdrop").classList.add("open");
+  requestAnimationFrame(()=>s.classList.add("open")); }
+function closeSheet(){ $("#sheet").classList.remove("open"); $("#backdrop").classList.remove("open"); }
+$("#backdrop").addEventListener("click",closeSheet);
+
+function sheetHead(title,sub){
+  return `<div class="sheet-head">
+    <div><div class="poster-label" style="font-size:38px;line-height:.86">${title}</div>
+      ${sub?`<div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-soft);margin-top:4px">${sub}</div>`:""}</div>
+    <button class="btn-close" id="sheet-x" aria-label="close"><svg width="16" height="16" viewBox="0 0 16 16" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"><path d="M3 3 L13 13 M13 3 L3 13"></path></svg></button>
   </div>`;
 }
-
-function renderTrips(){
-  renderTagRow();
-  const tl = $("#timeline");
-  const today = todayStr();
-  let trips = [...state.trips];
-  if(activeTag) trips = trips.filter(t => (t.tags||[]).includes(activeTag));
-
-  if(!trips.length){
-    tl.innerHTML = `<div class="empty"><b>${state.trips.length ? "No trips with this tag" : "No trips yet"}</b>${state.trips.length ? "Pick another tag, or All." : "Tap + to log your first one — past or planned."}</div>`;
-    renderStats();
-    return;
-  }
-
-  const upcoming = trips.filter(t => t.start > today).sort((a,b)=> b.start.localeCompare(a.start));
-  const current  = trips.filter(t => t.start <= today && (t.end || t.start) >= today).sort((a,b)=> b.start.localeCompare(a.start));
-  const past     = trips.filter(t => (t.end || t.start) < today).sort((a,b)=> b.start.localeCompare(a.start));
-
-  let html = `<div class="trail">`;
-  html += upcoming.map(t => tripCard(t, "upcoming")).join("");
-  html += `<div class="here"><span class="pin" aria-hidden="true"></span><span>YOU ARE HERE</span></div>`;
-  html += current.map(t => tripCard(t, "now")).join("");
-  html += past.map(t => tripCard(t, "past")).join("");
-  html += `</div>`;
-  tl.innerHTML = html;
-
-  tl.querySelectorAll(".card").forEach(c => c.addEventListener("click", () => openSheet(c.dataset.id)));
-  renderStats();
+function sheetDecor(){
+  return `<div style="position:absolute;right:-28px;top:-26px;z-index:0">${blobHTML(150,8,"")}</div>
+    ${tetroHTML("s",16,INK,"right:96px;top:30px;z-index:0")}`;
 }
 
-function renderStats(){
-  const today = todayStr();
-  const past = state.trips.filter(t => (t.end || t.start) <= today);
-  const up = state.trips.filter(t => t.start > today).length;
-  const totalNights = past.reduce((s,t)=> s + nights(t.start, t.end), 0);
-  const places = new Set(state.trips.map(t => t.place).filter(Boolean)).size;
-  $("#statline").innerHTML = `<b>${past.length}</b> trips · <b>${totalNights}</b> nights out · <b>${places}</b> places · <b>${up}</b> upcoming`;
+/* ── trip create/edit sheet ── */
+function allTags(){ const set=new Set(["lake","with family","solo","views","group","spring","autumn","winter"]);
+  state.trips.forEach(t=>(t.tags||[]).forEach(g=>set.add(g))); return [...set]; }
+
+function openTripSheet(id){
+  const t = id ? state.trips.find(x=>x.id===id) : null;
+  const sel = new Set(t ? (t.tags||[]) : []);
+  const suggestions = allTags();
+  const chips = suggestions.map(g=>`<button type="button" class="chip-btn tag-toggle" data-tag="${esc(g)}"><span class="chip ${sel.has(g)?"":"off"}">${esc(g)}</span></button>`).join("");
+  openSheet(`
+    ${sheetDecor()}
+    <div class="sheet-body">
+      <div class="sheet-grab"></div>
+      ${sheetHead(t?"Edit Log":"New Log","PLAN A CAMPING TRIP")}
+      <div class="sheet-rule"></div>
+      <label class="f-field"><div class="f-label">Trip name</div>
+        <input class="f-input big" id="f-title" placeholder="Lakeside Long Weekend" value="${t?esc(t.title):""}"></label>
+      <div class="f-row">
+        <label class="f-field" style="flex:1"><div class="f-label">Start</div>
+          <input class="f-input" type="date" id="f-start" value="${t?t.start:todayStr()}"></label>
+        <label class="f-field" style="flex:1"><div class="f-label">End</div>
+          <input class="f-input" type="date" id="f-end" value="${t?(t.end||""):""}"></label>
+      </div>
+      <label class="f-field"><div class="f-label">Location</div>
+        <input class="f-input" id="f-place" placeholder="Lake Sagami" value="${t?esc(t.place||""):""}"></label>
+      <div class="f-label" style="margin:2px 0 9px">Tags</div>
+      <div id="tag-box" style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:12px">${chips}</div>
+      <input class="f-input" id="f-newtag" placeholder="+ add a tag" style="margin-bottom:20px;font-size:13px">
+      <label class="f-field"><div class="f-label">Notes</div>
+        <textarea class="f-input" id="f-notes" placeholder="Site number · weather · what to remember">${t?esc(t.notes||""):""}</textarea></label>
+      <button class="btn-create" id="f-save">${t?"Save Log":"Create Log"}</button>
+      ${t?`<button class="btn-delete" id="f-del">Delete this trip</button>`:""}
+    </div>`);
+
+  $("#sheet-x").addEventListener("click",closeSheet);
+  $("#tag-box").addEventListener("click",e=>{
+    const b=e.target.closest(".tag-toggle"); if(!b) return;
+    const g=b.dataset.tag; if(sel.has(g))sel.delete(g); else sel.add(g);
+    b.querySelector(".chip").classList.toggle("off",!sel.has(g));
+  });
+  $("#f-newtag").addEventListener("keydown",e=>{
+    if(e.key!=="Enter") return; e.preventDefault();
+    const g=e.target.value.trim().toLowerCase(); if(!g) return;
+    sel.add(g);
+    const box=$("#tag-box");
+    if(!box.querySelector(`.tag-toggle[data-tag="${CSS.escape(g)}"]`)){
+      box.insertAdjacentHTML("beforeend",`<button type="button" class="chip-btn tag-toggle" data-tag="${esc(g)}"><span class="chip">${esc(g)}</span></button>`);
+    } else box.querySelector(`.tag-toggle[data-tag="${CSS.escape(g)}"] .chip`).classList.remove("off");
+    e.target.value="";
+  });
+  $("#f-save").addEventListener("click",()=>{
+    const title=$("#f-title").value.trim();
+    let start=$("#f-start").value, end=$("#f-end").value;
+    if(!title){ toast("Give the trip a name"); $("#f-title").focus(); return; }
+    if(!start){ toast("Pick a start date"); $("#f-start").focus(); return; }
+    if(end && end<start){ const tmp=start; start=end; end=tmp; }
+    const trip={ id:id||uid(), title, place:$("#f-place").value.trim(),
+      start, end:end||"", tags:[...sel], notes:$("#f-notes").value.trim() };
+    if(id){ const i=state.trips.findIndex(x=>x.id===id); state.trips[i]=trip; }
+    else state.trips.push(trip);
+    save(); closeSheet(); renderLog();
+    toast(id?"Trip updated":"Trip logged");
+  });
+  const del=$("#f-del");
+  del&&del.addEventListener("click",()=>{ if(confirm("Delete this trip? This can't be undone.")) deleteTrip(id); });
 }
+function deleteTrip(id){ state.trips=state.trips.filter(t=>t.id!==id); save(); closeSheet(); renderLog(); toast("Trip deleted"); }
 
-/* ---------- trip sheet ---------- */
-let editingId = null;
-
-function openSheet(id){
-  editingId = id || null;
-  const t = id ? state.trips.find(x => x.id === id) : null;
-  $("#sheet-title").textContent = t ? "Edit trip" : "New trip";
-  $("#f-title").value = t ? t.title : "";
-  $("#f-place").value = t ? (t.place || "") : "";
-  $("#f-start").value = t ? t.start : todayStr();
-  $("#f-end").value = t ? (t.end || "") : "";
-  $("#f-tags").value = t ? (t.tags || []).join(", ") : "";
-  $("#f-notes").value = t ? (t.notes || "") : "";
-  $("#btn-delete").hidden = !t;
-  renderTagSuggestions();
-  $("#backdrop").classList.add("open");
-  $("#sheet").classList.add("open");
-}
-function closeSheet(){
-  $("#backdrop").classList.remove("open");
-  $("#sheet").classList.remove("open");
-  editingId = null;
-}
-function renderTagSuggestions(){
-  const box = $("#tagsugg");
-  const tags = allTags();
-  box.innerHTML = tags.map(g => `<button class="chip" type="button" data-g="${escapeHtml(g)}">${escapeHtml(g)}</button>`).join("");
-  box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
-    const inp = $("#f-tags");
-    const cur = inp.value.split(",").map(s=>s.trim()).filter(Boolean);
-    if(!cur.includes(b.dataset.g)) cur.push(b.dataset.g);
-    inp.value = cur.join(", ");
-  }));
-}
-
-$("#fab").addEventListener("click", () => openSheet(null));
-$("#backdrop").addEventListener("click", closeSheet);
-$("#btn-cancel").addEventListener("click", closeSheet);
-
-$("#btn-save").addEventListener("click", () => {
-  const title = $("#f-title").value.trim();
-  const start = $("#f-start").value;
-  if(!title){ toast("Give the trip a name"); $("#f-title").focus(); return; }
-  if(!start){ toast("Pick a start date"); $("#f-start").focus(); return; }
-  let end = $("#f-end").value;
-  if(end && end < start){ const tmp = end; end = start; /* swap */ $("#f-start").value = tmp; }
-  const trip = {
-    id: editingId || uid(),
-    title,
-    place: $("#f-place").value.trim(),
-    start: $("#f-start").value,
-    end: end || "",
-    tags: $("#f-tags").value.split(",").map(s=>s.trim()).filter(Boolean),
-    notes: $("#f-notes").value.trim()
-  };
-  const wasEditing = !!editingId;
-  if(wasEditing){
-    const i = state.trips.findIndex(t => t.id === editingId);
-    state.trips[i] = trip;
-  }else{
-    state.trips.push(trip);
-  }
-  save(); closeSheet(); renderTrips();
-  toast(wasEditing ? "Trip updated" : "Trip logged");
-});
-
-$("#btn-delete").addEventListener("click", () => {
-  if(!editingId) return;
-  if(!confirm("Delete this trip? This can't be undone.")) return;
-  state.trips = state.trips.filter(t => t.id !== editingId);
-  if(activeTag && !allTags().includes(activeTag)) activeTag = null;
-  save(); closeSheet(); renderTrips();
-  toast("Trip deleted");
-});
-
-/* ---------- generic list rendering ---------- */
-function renderList(listKey, ulSel){
-  const ul = $(ulSel);
-  const items = state[listKey];
-  if(!items.length){
-    ul.innerHTML = `<div class="empty"><b>Nothing here yet</b>Add your first item above.</div>`;
-    return;
-  }
-  ul.innerHTML = items.map(it => `
-    <li class="${it.done ? "done" : ""}" data-id="${it.id}">
-      <button class="tick" role="checkbox" aria-checked="${it.done}" aria-label="${escapeHtml(it.text)}">
-        <svg viewBox="0 0 24 24"><path d="M5 13 l5 5 9-11"/></svg>
-      </button>
-      <span class="txt">${escapeHtml(it.text)}</span>
-      <button class="del" aria-label="Remove ${escapeHtml(it.text)}">✕</button>
-    </li>`).join("");
-  ul.querySelectorAll("li").forEach(li => {
-    const id = li.dataset.id;
-    li.querySelector(".tick").addEventListener("click", () => {
-      const it = state[listKey].find(x => x.id === id);
-      it.done = !it.done;
-      save(); renderList(listKey, ulSel);
-    });
-    li.querySelector(".del").addEventListener("click", () => {
-      state[listKey] = state[listKey].filter(x => x.id !== id);
-      save(); renderList(listKey, ulSel);
-    });
+/* ── packing / todo add+edit sheet ── */
+function openItemSheet(kind,id){
+  const isTodo = kind==="todo";
+  const arr = isTodo ? state.todos : state.checklist;
+  const it = id ? arr.find(x=>x.id===id) : null;
+  const groups=[...new Set(state.todos.map(t=>t.group||"Tasks"))];
+  const lastGroup = (it&&it.group) || groups[0] || "Tasks";
+  openSheet(`
+    ${sheetDecor()}
+    <div class="sheet-body">
+      <div class="sheet-grab"></div>
+      ${sheetHead(it?(isTodo?"Edit Task":"Edit Gear"):(isTodo?"Add Task":"Add Gear"), isTodo?"WHAT NEEDS DOING":"WHAT TO PACK")}
+      <div class="sheet-rule"></div>
+      <label class="f-field"><div class="f-label">${isTodo?"Task":"Item"}</div>
+        <input class="f-input big" id="i-text" placeholder="${isTodo?"Buy marshmallows":"Camp chair"}" value="${it?esc(it.text):""}"></label>
+      ${isTodo?`<label class="f-field"><div class="f-label">Group</div>
+        <input class="f-input" id="i-group" list="grouplist" placeholder="Before You Go" value="${esc(lastGroup)}">
+        <datalist id="grouplist">${groups.map(g=>`<option value="${esc(g)}">`).join("")}</datalist></label>`:""}
+      <button class="btn-create" id="i-save" style="margin-top:6px">${it?"Save":"Add"}</button>
+      ${it?`<button class="btn-delete" id="i-del">Delete this ${isTodo?"task":"item"}</button>`:""}
+    </div>`);
+  $("#sheet-x").addEventListener("click",closeSheet);
+  $("#i-save").addEventListener("click",()=>{
+    const text=$("#i-text").value.trim(); if(!text){ toast("Type something first"); $("#i-text").focus(); return; }
+    if(it){ it.text=text; if(isTodo) it.group=$("#i-group").value.trim()||"Tasks"; }
+    else if(isTodo) state.todos.push({id:uid(),text,done:false,group:($("#i-group").value.trim()||"Tasks")});
+    else state.checklist.push({id:uid(),text,done:false});
+    save(); closeSheet(); isTodo?renderTodo():renderPacking();
+  });
+  const del=$("#i-del");
+  del&&del.addEventListener("click",()=>{
+    if(isTodo) state.todos=state.todos.filter(x=>x.id!==id); else state.checklist=state.checklist.filter(x=>x.id!==id);
+    save(); closeSheet(); isTodo?renderTodo():renderPacking();
   });
 }
-function addItem(listKey, inputSel, ulSel){
-  const inp = $(inputSel);
-  const text = inp.value.trim();
-  if(!text) return;
-  state[listKey].push({id:uid(), text, done:false});
-  inp.value = "";
-  save(); renderList(listKey, ulSel);
-  inp.focus();
+
+/* ════════════ tab bar + FAB ════════════ */
+const TABS=[
+  {key:"log",      label:"Log",     shape:"triangle"},
+  {key:"packing",  label:"Packing", shape:"square"},
+  {key:"todo",     label:"To-do",   shape:"circle"},
+  {key:"campfire", label:"Campfire",shape:"diamond"},
+];
+function tabShape(kind,on){
+  const c=on?CORAL:INKSOFT, fill=on?CORAL:"none";
+  const p=`fill="${fill}" stroke="${c}" stroke-width="2" stroke-linejoin="round"`;
+  let body="";
+  if(kind==="circle")  body=`<circle cx="11" cy="11" r="8" ${p}></circle>`;
+  if(kind==="square")  body=`<rect x="3.5" y="3.5" width="15" height="15" ${p}></rect>`;
+  if(kind==="triangle")body=`<path d="M11 3 L19 18 L3 18 Z" ${p}></path>`;
+  if(kind==="diamond") body=`<path d="M11 2 L20 11 L11 20 L2 11 Z" ${p}></path>`;
+  return `<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">${body}</svg>`;
+}
+let activeTab="log";
+function renderTabbar(){
+  $("#tabbar").innerHTML = TABS.map(t=>`
+    <button class="tab ${t.key===activeTab?"active":""}" data-tab="${t.key}">
+      ${tabShape(t.shape,t.key===activeTab)}<span>${t.label}</span>
+    </button>`).join("");
+  $("#tabbar").querySelectorAll(".tab").forEach(b=> b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+}
+const FAB_CFG={ log:{lines:["NEW","LOG"],bg:INK,fn:()=>openTripSheet(null)},
+  packing:{lines:["ADD","ITEM"],bg:CORALD,fn:()=>openItemSheet("pack",null)},
+  todo:{lines:["ADD","TASK"],bg:CORALD,fn:()=>openItemSheet("todo",null)} };
+function setFab(tab){
+  const fab=$("#fab"); const cfg=FAB_CFG[tab];
+  if(!cfg){ fab.hidden=true; return; }
+  fab.hidden=false; fab.innerHTML=sealHTML(cfg.lines,104,cfg.bg);
+  fab.setAttribute("aria-label",cfg.lines.join(" "));
+  fab.onclick=cfg.fn;
+}
+$("#fab").addEventListener("pointerdown",()=>$("#fab").classList.add("press"));
+["pointerup","pointerleave","pointercancel"].forEach(ev=>$("#fab").addEventListener(ev,()=>$("#fab").classList.remove("press")));
+
+function switchTab(key){
+  activeTab=key;
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $("#screen-"+key).classList.add("active");
+  renderTabbar(); setFab(key);
+  window.scrollTo({top:0});
+  if(key==="log") renderLog();
+  else if(key==="packing") renderPacking();
+  else if(key==="todo") renderTodo();
+  else renderCampfire();
 }
 
-$("#check-add").addEventListener("click", () => addItem("checklist","#check-input","#checklist"));
-$("#check-input").addEventListener("keydown", e => { if(e.key === "Enter") addItem("checklist","#check-input","#checklist"); });
-$("#btn-reset-checks").addEventListener("click", () => {
-  state.checklist.forEach(it => it.done = false);
-  save(); renderList("checklist","#checklist");
-  toast("Checklist reset");
+/* ════════════ backup ════════════ */
+function exportBackup(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="camplog-backup-"+todayStr()+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+$("#import-file").addEventListener("change",e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{
+      const data=JSON.parse(r.result);
+      if(!data||!Array.isArray(data.trips)) throw new Error("bad");
+      state=migrate({ trips:data.trips,
+        checklist:Array.isArray(data.checklist)?data.checklist:state.checklist,
+        todos:Array.isArray(data.todos)?data.todos:state.todos });
+      save(); switchTab(activeTab); toast("Backup restored");
+    }catch(err){ toast("That file isn't a Camp Log backup"); } };
+  r.readAsText(file); e.target.value="";
 });
 
-$("#todo-add").addEventListener("click", () => addItem("todos","#todo-input","#todolist"));
-$("#todo-input").addEventListener("keydown", e => { if(e.key === "Enter") addItem("todos","#todo-input","#todolist"); });
-$("#btn-clear-done").addEventListener("click", () => {
-  state.todos = state.todos.filter(it => !it.done);
-  save(); renderList("todos","#todolist");
-});
-
-/* ---------- backup ---------- */
-$("#btn-export").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "camplog-backup-" + todayStr() + ".json";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(()=> URL.revokeObjectURL(a.href), 4000);
-});
-$("#btn-import").addEventListener("click", () => $("#import-file").click());
-$("#import-file").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if(!file) return;
-  const r = new FileReader();
-  r.onload = () => {
-    try{
-      const data = JSON.parse(r.result);
-      if(!data || !Array.isArray(data.trips)) throw new Error("bad");
-      state = {
-        trips: data.trips,
-        checklist: Array.isArray(data.checklist) ? data.checklist : state.checklist,
-        todos: Array.isArray(data.todos) ? data.todos : state.todos
-      };
-      save(); renderTrips(); renderList("checklist","#checklist"); renderList("todos","#todolist");
-      toast("Backup restored");
-    }catch(err){
-      toast("That file isn't a Camp Log backup");
-    }
-  };
-  r.readAsText(file);
-  e.target.value = "";
-});
-
-/* ---------- init ---------- */
-renderTrips();
-renderList("checklist","#checklist");
-renderList("todos","#todolist");
+/* ════════════ init ════════════ */
+if(!localStorage.getItem(KEY)) save();   // persist the seeded data with stable ids
+renderTabbar();
+setFab(activeTab);
+renderLog();
+renderPacking();
+renderTodo();
+renderCampfire();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ if(activeTab==="log") sizeLogHero(); });
 
 if("serviceWorker" in navigator){
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  });
+  window.addEventListener("load",()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
 }
 </script>
 </body>

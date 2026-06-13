@@ -2,12 +2,27 @@
 
 A pocket logbook for camping trips. Runs fully offline on your iPhone once installed, and all data stays on your device.
 
+A poster-collage interface: giant Archivo wordmarks, color-blocked fields, woodgrain
+waves, scattered ink marks and a die-cut starburst "seal" button. Four tabs along the
+bottom (triangle / square / circle / diamond).
+
 ## What's inside
 
-- **Trips** — a trail-style timeline. Upcoming trips sit above the "YOU ARE HERE" marker, past trips below it. Tap any trip to edit or delete it. Tap a tag chip to filter.
-- **Checklist** — a reusable packing list (seeded with basics; edit freely). "Uncheck all" resets it before the next trip.
-- **To-do** — a simple task list with "Clear done".
-- **Backup** — Export/Import buttons at the bottom of the Trips tab save and restore everything as a JSON file. Do this occasionally; data lives only in your phone's browser storage.
+- **Log** (triangle) — your trips. The soonest upcoming trip headlines as a **Next Out**
+  card with a countdown; everything else is listed below under **Trips**. Tap the **NEW LOG**
+  seal to add one, tap a trip to edit, or swipe a row left for **Edit / Delete**.
+- **Packing** (square) — a reusable gear manifest with a packed count. Tap an item to cross
+  it off, swipe to edit/delete, **ADD ITEM** to add. "Reset all" clears the checkmarks
+  before the next trip.
+- **To-do** (circle) — tasks grouped under headings (e.g. *Before You Go*, *At Camp*). Tap to
+  check, swipe to edit/delete, **ADD TASK** to add (with a group). "Clear done" sweeps
+  finished tasks.
+- **Campfire** (diamond) — placeholder for now ("coming soon").
+- **Backup** — Export/Import links at the bottom of the Log tab save and restore everything as
+  a JSON file. Do this occasionally; data lives only in your phone's browser storage.
+
+On first launch the app is seeded with sample trips, a packing list and a few tasks so it
+looks like the poster out of the box — edit or delete them freely.
 
 ## Deploy with GitHub Pages (one time, ~5 minutes)
 
