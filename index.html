@@ -280,15 +280,6 @@ function waveHTML(w,h,color,sw,lines,style){
 function squiggleHTML(w,color,sw,style){
   return `<svg width="${w}" height="${Math.round(w*1.15)}" viewBox="0 0 150 172" style="position:absolute;${style||""}" aria-hidden="true"><path fill="none" stroke="${color}" stroke-width="${sw||11}" stroke-linecap="round" stroke-linejoin="round" d="M14 26 C14 8 40 6 52 16 C66 28 50 48 32 46 C10 44 6 70 26 78 C50 88 78 70 70 46 C64 28 86 20 100 32 C118 47 102 78 78 96 C50 117 78 138 104 128 C126 120 140 138 132 156"></path></svg>`;
 }
-/* ripped-paper top edge — stretches to its container's width */
-function tornTopHTML(color,style){
-  const peaks=[7,19,10,22,13,17,8,21,11,16,9,20,12,15,8,18,7];
-  const seg=peaks.length-1, H=24;
-  let d=`M0 ${H}`;
-  for(let i=0;i<peaks.length;i++){ d+=` L${(100*i/seg).toFixed(2)} ${(H-peaks[i]).toFixed(1)}`; }
-  d+=` L100 ${H} Z`;
-  return `<svg width="100" height="${H}" viewBox="0 0 100 ${H}" preserveAspectRatio="none" style="${style||""}" aria-hidden="true"><path d="${d}" fill="${color}"></path></svg>`;
-}
 function arrowTileHTML(size,style){
   const a=Math.round(size*0.62);
   return `<div style="position:absolute;width:${size}px;height:${size}px;background:${YELLOW};display:flex;align-items:center;justify-content:center;${style||""}" aria-hidden="true"><svg width="${a}" height="${a}" viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5 L19 19 M19 9 V19 H9"></path></svg></div>`;
@@ -315,44 +306,10 @@ function sealHTML(lines,size,bg){
 function chipHTML(text){ return `<span class="chip">${esc(text)}</span>`; }
 function hlHTML(text){ return `<span class="hl"><b>${esc(text)}</b></span>`; }
 
-/* ════════════ parallax · layers drift by stacking order ════════════ */
-/* Each direct child of a .parallax-stage is shifted on scroll in proportion
-   to its z-index: backgrounds (z 0) hold still, foreground marks/cards drift
-   faster, so the collage gains depth. Existing transforms are preserved. */
-const RM_QUERY = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : {matches:false};
-const PLLX_RATE = 0.011;            // extra scroll fraction per z-layer
-function setupParallax(screen){
-  if(!screen || RM_QUERY.matches) return;
-  screen.querySelectorAll(".parallax-stage").forEach(stage=>{
-    for(const el of stage.children){
-      const z = parseInt(el.style.zIndex||"0",10)||0;
-      if(z<=0){ delete el.dataset.pllx; el.style.transform = el.dataset.pbase||el.style.transform||""; continue; }
-      el.dataset.pllx = (z*PLLX_RATE).toFixed(3);
-      const cs = getComputedStyle(el).transform;
-      el.dataset.pbase = (cs && cs!=="none") ? cs : "";
-    }
-  });
-  applyParallax();
-}
-let pllxQueued=false;
-function applyParallax(){
-  const y = window.pageYOffset || document.documentElement.scrollTop || 0;
-  document.querySelectorAll(".screen.active .parallax-stage > [data-pllx]").forEach(el=>{
-    const f = parseFloat(el.dataset.pllx)||0;
-    el.style.transform = `translate3d(0,${(-y*f).toFixed(1)}px,0) ${el.dataset.pbase||""}`.trim();
-  });
-}
-function onScrollParallax(){
-  if(pllxQueued) return; pllxQueued=true;
-  requestAnimationFrame(()=>{ applyParallax(); pllxQueued=false; });
-}
-if(!RM_QUERY.matches) window.addEventListener("scroll",onScrollParallax,{passive:true});
-
 /* ════════════ SCREEN 1 · LOG ════════════ */
-const NEXTOUT_TOP = 352;
 function nextOutCard(t){
   if(!t){
-    return `<div id="nextout" class="paper" style="position:absolute;left:16px;top:${NEXTOUT_TOP}px;width:352px;z-index:6">
+    return `<div class="paper" style="position:absolute;left:16px;top:398px;width:352px;z-index:6">
       <div style="padding:24px 20px">
         <div class="poster-label" style="font-size:26px">Nothing planned</div>
         <div style="font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:8px;line-height:1.5">Tap the NEW LOG seal to plan your next trip — past or upcoming.</div>
@@ -363,28 +320,23 @@ function nextOutCard(t){
   if(t.tags&&t.tags[0]) tagBits.push(chipHTML(t.tags[0]));
   if(t.tags&&t.tags[1]) tagBits.push(hlHTML(t.tags[1]));
   const note = t.notes ? `<div style="font-family:var(--mono);font-size:13px;line-height:1.5;margin-top:12px;text-transform:uppercase">${esc(t.notes).replace(/\n/g,"<br>")}</div>` : "";
-  return `<div id="nextout" style="position:absolute;left:16px;top:${NEXTOUT_TOP}px;width:352px;z-index:6">
-    <div aria-hidden="true" style="position:absolute;inset:11px -11px -13px 13px;background:var(--cream-d);border-radius:14px;box-shadow:0 12px 24px rgba(34,30,24,.18)"></div>
-    <div class="paper trip-card" data-id="${t.id}" style="position:relative;z-index:1;cursor:pointer;overflow:hidden">
-      <div style="background:#EBE9E1;padding:18px 20px 0">
-        <div style="display:flex;align-items:flex-end;gap:14px">
-          <div>
-            <div style="font-family:var(--disp);font-weight:800;font-size:28px;line-height:.9">${MONT[a.m]}</div>
-            <div style="font-family:var(--disp);font-weight:900;font-size:46px;line-height:.86;letter-spacing:-.02em">${dayRange(t.start,t.end)}</div>
-          </div>
-          <div style="font-family:var(--mono);font-size:15px;letter-spacing:.08em;color:var(--ink-soft);padding-bottom:6px">${n} NIGHT${n===1?"":"S"}</div>
+  return `<div class="paper trip-card" data-id="${t.id}" style="position:absolute;left:16px;top:398px;width:352px;z-index:6;cursor:pointer">
+    <div style="padding:18px 20px 16px;position:relative">
+      <div style="display:flex;align-items:flex-end;gap:14px">
+        <div>
+          <div style="font-family:var(--disp);font-weight:800;font-size:28px;line-height:.9">${MONT[a.m]}</div>
+          <div style="font-family:var(--disp);font-weight:900;font-size:46px;line-height:.86;letter-spacing:-.02em">${dayRange(t.start,t.end)}</div>
         </div>
-        <div style="height:2.5px;background:var(--ink);margin:12px 0 0"></div>
+        <div style="font-family:var(--mono);font-size:15px;letter-spacing:.08em;color:var(--ink-soft);padding-bottom:6px">${n} NIGHT${n===1?"":"S"}</div>
       </div>
-      <div style="padding:14px 20px 16px;position:relative">
-        <div style="font-family:var(--disp);font-weight:800;font-size:21px;letter-spacing:-.01em">${esc(t.title)}</div>
-        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:8px">
-          ${t.place?`<span style="font-family:var(--mono);font-size:14px;color:var(--ink-soft)">→ ${esc(t.place)}</span>`:""}
-          ${tagBits.join("")}
-        </div>
-        ${note}
-        <span style="position:absolute;right:16px;bottom:14px">${infoDotHTML(18)}</span>
+      <div style="height:2.5px;background:var(--ink);margin:12px 0 11px"></div>
+      <div style="font-family:var(--disp);font-weight:800;font-size:21px;letter-spacing:-.01em">${esc(t.title)}</div>
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:8px">
+        ${t.place?`<span style="font-family:var(--mono);font-size:14px;color:var(--ink-soft)">→ ${esc(t.place)}</span>`:""}
+        ${tagBits.join("")}
       </div>
+      ${note}
+      <span style="position:absolute;right:16px;bottom:14px">${infoDotHTML(18)}</span>
     </div></div>`;
 }
 
@@ -409,7 +361,7 @@ function renderLog(){
     : `<div class="empty-note">No other trips logged yet.</div>`;
 
   $("#screen-log").innerHTML = `
-    <div id="log-hero" class="parallax-stage" style="position:relative;height:640px">
+    <div id="log-hero" style="position:relative;height:640px">
       ${block("0","calc(-1*var(--safe-top))","51%","calc(452px + var(--safe-top))",SAGE,0)}
       ${block("51%","calc(-1*var(--safe-top))","49%","calc(452px + var(--safe-top))",OLIVE,0)}
       ${blobHTML(206,-4,"position:absolute;left:18px;top:28px;z-index:4")}
@@ -420,21 +372,20 @@ function renderLog(){
       ${dotHTML(14,INK,"left:384px;top:252px;z-index:4")}
       ${arrowTileHTML(56,"left:22px;top:156px;z-index:5")}
       <div class="wordmark" style="position:absolute;left:18px;top:84px;z-index:5;font-size:58px">CAMP LOG</div>
-      <div style="position:absolute;right:14px;top:300px;z-index:5;text-align:right">
-        ${cd?`<div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--coral-d);margin-bottom:5px">${cd}</div>`:""}
-        <div class="poster-label" style="font-size:48px;line-height:.84;color:var(--coral);opacity:.55">Next Out</div>
+      <div style="position:absolute;right:14px;top:344px;z-index:8;text-align:right">
+        <div class="poster-label" style="font-size:40px">Next Out</div>
+        ${cd?`<div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--coral-d);margin-top:4px">${cd}</div>`:""}
       </div>
       ${nextOutCard(nextOut)}
     </div>
 
-    <div class="sheet-zone parallax-stage" style="margin-top:6px">
+    <div class="sheet-zone" style="margin-top:6px">
       <div style="position:absolute;left:150px;top:0;width:218px;bottom:0;background:${OLIVE};z-index:0"></div>
-      <div style="position:absolute;left:-4px;top:0;width:360px;height:120px;background:${WOOD};z-index:3;overflow:hidden">
-        ${waveHTML(360,120,INK,12,3)}
+      <div style="position:absolute;left:-4px;top:0;width:326px;height:120px;background:${WOOD};z-index:3;overflow:hidden">
+        ${waveHTML(326,120,INK,12,3)}
       </div>
-      <div class="poster-label" style="position:absolute;right:28px;top:30px;font-size:44px;z-index:8;text-align:right">Trips</div>
-      <div style="position:relative;z-index:2;margin:66px 34px 0;background:${KRAFT};box-shadow:0 10px 26px rgba(34,30,24,.16);padding:42px 22px 22px">
-        ${tornTopHTML(KRAFT,"position:absolute;left:0;right:0;width:100%;height:18px;top:-13px;z-index:6")}
+      <div class="poster-label" style="position:absolute;left:30px;top:36px;font-size:40px;z-index:8">Trips</div>
+      <div style="position:relative;z-index:2;margin:64px 34px 0;background:${KRAFT};box-shadow:0 10px 26px rgba(34,30,24,.16);padding:42px 22px 22px">
         ${tetroHTML("step",18,INK,"right:8px;top:14px;z-index:4")}
         ${dotHTML(15,INK,"right:30px;top:120px;z-index:4")}
         ${squiggleHTML(96,INK,11,"left:-12px;bottom:-12px;z-index:1")}
@@ -461,12 +412,11 @@ function renderLog(){
   $("#btn-export").addEventListener("click",exportBackup);
   $("#btn-import").addEventListener("click",()=>$("#import-file").click());
   sizeLogHero();
-  setupParallax($("#screen-log"));
 }
 /* size the Log hero so the (variable-height) Next Out card never crowds the Trips sheet */
 function sizeLogHero(){
-  const hero=$("#log-hero"), wrap=$("#nextout")||$("#screen-log .paper");
-  if(hero && wrap) hero.style.height = (wrap.offsetTop + wrap.offsetHeight + 42) + "px";
+  const hero=$("#log-hero"), card=$("#screen-log .paper");
+  if(hero && card) hero.style.height = (card.offsetTop + card.offsetHeight + 30) + "px";
 }
 
 /* ════════════ SCREEN 2 · PACKING ════════════ */
@@ -485,7 +435,7 @@ function renderPacking(){
     : `<div class="empty-note">Nothing on the manifest.<br>Tap ADD ITEM to start packing.</div>`;
 
   $("#screen-packing").innerHTML = `
-    <div class="parallax-stage" style="position:relative;height:250px">
+    <div style="position:relative;height:250px">
       ${block("0","calc(-1*var(--safe-top))","57%","calc(250px + var(--safe-top))",SAGE,0)}
       ${block("57%","calc(-1*var(--safe-top))","43%","calc(250px + var(--safe-top))",OLIVE,0)}
       ${blobHTML(250,-4,"position:absolute;left:-22px;top:34px;z-index:4")}
@@ -494,7 +444,7 @@ function renderPacking(){
       <div class="wordmark" style="position:absolute;left:18px;top:74px;z-index:6;font-size:58px">PACKING</div>
     </div>
 
-    <div class="sheet-zone parallax-stage">
+    <div class="sheet-zone">
       <div style="position:absolute;left:168px;top:0;width:238px;bottom:0;background:${OLIVE};z-index:0"></div>
       <div style="position:absolute;left:-4px;top:0;width:250px;height:86px;background:${WOOD};z-index:3;overflow:hidden">${waveHTML(250,86,INK,9,2)}</div>
       <div class="poster-label" style="position:absolute;left:20px;top:36px;z-index:7;font-size:26px">Gear Manifest</div>
@@ -518,7 +468,6 @@ function renderPacking(){
     });
   });
   $("#btn-reset").addEventListener("click",()=>{ state.checklist.forEach(it=>it.done=false); save(); renderPacking(); toast("Checklist reset"); });
-  setupParallax($("#screen-packing"));
 }
 
 /* ════════════ SCREEN 3 · TO-DO ════════════ */
@@ -553,7 +502,7 @@ function renderTodo(){
     : `<div class="empty-note">No tasks yet.<br>Tap ADD TASK to make a plan.</div>`;
 
   $("#screen-todo").innerHTML = `
-    <div class="parallax-stage" style="position:relative;height:236px">
+    <div style="position:relative;height:236px">
       ${block("0","calc(-1*var(--safe-top))","49%","calc(236px + var(--safe-top))",OLIVE,0)}
       ${block("49%","calc(-1*var(--safe-top))","51%","calc(236px + var(--safe-top))",SAGE,0)}
       ${blobHTML(224,-6,"position:absolute;right:-26px;top:32px;z-index:4")}
@@ -563,7 +512,7 @@ function renderTodo(){
       <div class="wordmark" style="position:absolute;right:22px;top:74px;z-index:6;font-size:62px;text-align:right">TO-DO</div>
     </div>
 
-    <div class="sheet-zone parallax-stage">
+    <div class="sheet-zone">
       <div style="position:absolute;left:36px;top:0;width:210px;bottom:0;background:${OLIVE};z-index:0"></div>
       <div style="position:absolute;right:-4px;top:12px;width:232px;height:84px;background:${WOOD};z-index:3;overflow:hidden">${waveHTML(232,84,INK,9,2)}</div>
       <div class="poster-label" style="position:absolute;left:22px;top:52px;z-index:7;font-size:26px;max-width:300px">${esc(activeTitle)}</div>
@@ -587,13 +536,12 @@ function renderTodo(){
     });
   });
   $("#btn-clear").addEventListener("click",()=>{ state.todos=state.todos.filter(it=>!it.done); save(); renderTodo(); toast("Cleared done"); });
-  setupParallax($("#screen-todo"));
 }
 
 /* ════════════ SCREEN 4 · CAMPFIRE (placeholder) ════════════ */
 function renderCampfire(){
   $("#screen-campfire").innerHTML = `
-    <div class="parallax-stage" style="position:relative;height:300px">
+    <div style="position:relative;height:300px">
       ${block("0","calc(-1*var(--safe-top))","51%","calc(250px + var(--safe-top))",OLIVE,0)}
       ${block("51%","calc(-1*var(--safe-top))","49%","calc(250px + var(--safe-top))",SAGE,0)}
       ${blobHTML(230,-4,"position:absolute;left:-18px;top:34px;z-index:4")}
@@ -611,7 +559,6 @@ function renderCampfire(){
         The campfire is still being built — stories, songs and stargazing notes will live here.
       </div>
     </div>`;
-  setupParallax($("#screen-campfire"));
 }
 
 /* ════════════ swipe-row interaction (ported from SwipeRow) ════════════ */
